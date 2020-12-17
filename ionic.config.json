@@ -1,0 +1,8 @@
+{
+  "name": "CobranzasDMSA",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "ionic-angular",
+  "id": "1.0"
+}

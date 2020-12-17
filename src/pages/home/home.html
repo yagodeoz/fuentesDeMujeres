@@ -1,0 +1,55 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Sistema Gestión Ventas</ion-title>
+  </ion-navbar>
+
+  <!-- Agrega Panel de Busqueda
+  <ion-toolbar>
+    <ion-searchbar></ion-searchbar>
+  </ion-toolbar>
+  Agrega Panel de Busqueda -->
+   
+</ion-header>
+
+
+
+<ion-content padding>
+  <button ion-button full color="success" menuToggle>Bienvenido al Sistema de Gestión Ventas</button>
+  <ion-item text-center>
+    <ion-img width="192" height="165" src="assets/imgs/logo_dmujeres.jpg" ></ion-img>
+  </ion-item>
+  <h3>Información General </h3>
+
+    <ion-item>
+      <ion-label>Usuario: {{beanSeguridad.USUARIO_LOGONEADO | uppercase }}</ion-label>
+    </ion-item>
+    
+    <ion-item>
+      <ion-label>Nombre: {{beanSeguridad.NOMBRE_USUARIO }}</ion-label>      
+    </ion-item>
+    
+    <ion-item>
+      <ion-label>Ult. Actualización: {{beanSeguridad.FECHASINCRONIZADO}}</ion-label>      
+    </ion-item>
+    <!--
+    <ion-grid>
+      <ion-row>
+        <ion-col width-50 style="text-align: center">
+           <button ion-button> <ion-icon name="calculator" (click)="ImprimirTicket()"> Imprimir</ion-icon></button> 
+        </ion-col>
+        <ion-col width-50 style="text-align: center">
+          <button ion-button> <ion-icon name="refresh" (click)="actualizarApp()"> Actualizar</ion-icon></button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+    
+    <ion-item>
+      <ion-label>enlinea: {{enlinea}}</ion-label>      
+    </ion-item> 
+    -->
+
+
+</ion-content>

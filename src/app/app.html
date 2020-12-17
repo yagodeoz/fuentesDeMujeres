@@ -1,0 +1,58 @@
+<ion-menu [content]="content">
+  <!-- 
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Menú</ion-title>
+    </ion-toolbar>
+  </ion-header>
+-->
+
+<ion-header>
+  <ion-toolbar class="user-profile">
+    <ion-grid>
+      <ion-row>
+        <ion-col col-4>
+            <div class="user-avatar">
+              <img src="../assets/imgs/logo_dmujeres.jpg">
+            </div>
+        </ion-col>
+        <ion-col padding-top col-8>
+          <h2 ion-text class="no-margin bold text-white">
+            {{beanSeguridad.USUARIO_LOGONEADO | uppercase}}
+          </h2>
+          <span ion-text color="light">{{beanSeguridad.NOMBRE_USUARIO}}</span>
+        </ion-col>
+      </ion-row>
+
+      <ion-row no-padding class="other-data">
+        <ion-col no-padding class="column">
+          <button ion-button icon-left small full color="light" menuClose (click)="inicioApp()"> <!--disabled-->
+            <ion-icon name="home"></ion-icon>
+            Inicio
+          </button>
+        </ion-col>
+        <ion-col no-padding class="column">
+          <button ion-button icon-left small full color="danger" menuClose (click)="salirApp()">
+            <ion-icon name="log-out"></ion-icon>
+            Salir
+          </button>
+        </ion-col>
+      </ion-row>
+
+    </ion-grid>
+
+  </ion-toolbar>
+</ion-header>
+
+
+  <ion-content>
+    <ion-list>
+      <button menuClose ion-item *ngFor="let p of pages" (click)="openPage(p)"> 
+          <ion-icon [name]="p.icon" item-left></ion-icon>{{p.title}} </button>
+    </ion-list>
+  </ion-content>
+
+</ion-menu>
+
+<!-- Disable swipe-to-go-back because it's poor UX to combine STGB with side menus -->
+<ion-nav [root]="rootPage" #content swipeBackEnabled="false"></ion-nav>

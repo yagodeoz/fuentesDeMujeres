@@ -1,0 +1,41 @@
+<!--
+  Generated template for the LoginPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+
+
+  <ion-header>
+  <ion-navbar color="primary">
+    <ion-title text-center>Bienvenido al Sistema</ion-title>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content>
+  <form [formGroup]="myForm" (ngSubmit)="loginUser()">
+    <ion-list>
+      <ion-item text-center>
+        <ion-img width="192" height="165" src="assets/imgs/logo_dmujeres.jpg" ></ion-img>
+      </ion-item>
+      <ion-item>
+        <ion-icon name="person" item-left></ion-icon>
+        <ion-label stacked>Usuario:</ion-label>
+        <ion-input formControlName="usuario" type="text" placeholder="Ingrese su Usuario"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-icon name="key" item-left></ion-icon>
+        <ion-label stacked>Contraseña:</ion-label>
+        <ion-input formControlName="password" [type]="passwordType" placeholder="Ingrese su Contraseña"></ion-input>
+        <ion-icon item-end [name]="passwordIcon" class="passwordIcon" (click)='hideShowPassword()'></ion-icon>
+      </ion-item>
+    </ion-list>
+    <div padding>
+      <button ion-button block type="submit" [disabled]="!myForm.valid">Ingresar</button>
+    </div>    
+  </form>
+  <br>
+  <p text-center> Todos los derechos reservados &#169; D'Mujeres S.A. 2019 </p>  
+  <p text-center color="secondary"> Versión: 1.19_07_10 </p>
+</ion-content>

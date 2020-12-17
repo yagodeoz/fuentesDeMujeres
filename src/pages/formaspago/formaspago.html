@@ -1,0 +1,117 @@
+<!--
+  Generated template for the FormaspagoPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+    <ion-navbar>
+        <ion-title>Forma de Pago</ion-title>
+        <ion-buttons end>
+          <button ion-button (click)="closeModal('G')">Guardar</button>
+          <button ion-button (click)="closeModal('C')">Cancelar</button>
+        </ion-buttons>
+      </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+
+    <ion-item *ngIf=" isVisibleFormaPago ">
+        <ion-label color="primary" fixed>Forma Pago:</ion-label>
+        <ion-select #item [(ngModel)]="idformapago" (ionChange)="onSelectChangeFP(item)" >
+            <ion-option *ngFor="let idformapago of formaspago" value="{{idformapago.value}}" >{{idformapago.text}}</ion-option>
+        </ion-select>
+    </ion-item>
+
+    <ion-item *ngIf=" isVisibleCtaCompania ">
+        <ion-label color="primary" floating>Cta. Compañia:</ion-label>
+        <ion-select #item [(ngModel)]="idctacia" (ionChange)="onSelectChange('CTA_CIA',item)" >
+            <ion-option *ngFor="let idctacia of cuentascia" value="{{idctacia.value}}" >{{idctacia.text}}</ion-option>
+        </ion-select>
+    </ion-item>
+    
+    <ion-item *ngIf=" isVisibleNoDeposito ">
+      <ion-label color="primary" fixed>No. Deposito:</ion-label>
+      <ion-input [(ngModel)]="numerodeposito"  type="number" placeholder="Ingrese # Deposito"></ion-input> 
+    </ion-item>
+
+    <ion-item *ngIf=" isVisibleNoDeposito ">
+        <ion-label color="primary" fixed>Fecha Dep.:</ion-label>
+        <ion-datetime [initialValue]="_myDate"  displayFormat="YYYY-MM-DD" min="2018" max="2025" [(ngModel)]="fdeposito">{{datetimeValue| date: "yyyy-MM-dd"}}</ion-datetime>
+    </ion-item>
+  
+    <ion-item *ngIf=" isVisibleIndicador ">
+        <ion-label color="primary" fixed>Tipo Cheque:</ion-label>
+        <ion-select #item [(ngModel)]="tipocheque" (ionChange)="onSelectChange('TIPOCH',item)" >
+          <ion-option value="D">AL DIA</ion-option>
+          <ion-option value="P">POSFECHADO</ion-option>
+        </ion-select> 
+      </ion-item> 
+
+    <ion-item *ngIf=" isVisibleIndicador ">
+        <ion-label color="primary" fixed>Fecha Cobro:</ion-label>
+       <!-- <ion-datetime [initialValue]="_myDate"  displayFormat="YYYY-MM-DD" min="2018" max="2025" [(ngModel)]="fcobrocheque">{{datetimeValue| date: "yyyy-MM-dd"}}</ion-datetime> -->
+       <ion-datetime displayFormat="YYYY-MM-DD" min="2018" max="2025" [(ngModel)]="fcobrocheque">{{datetimeValue| date: "yyyy-MM-dd"}}</ion-datetime>
+    </ion-item>
+
+    <ion-item *ngIf=" isVisibleIndicador ">
+      <ion-label color="primary" fixed>Indicador:</ion-label>
+      <ion-select #item [(ngModel)]="idindicador" (ionChange)="onSelectChange('INDICADOR',item)" >
+        <ion-option value="N">PROPIO</ion-option>
+        <ion-option value="S">TERCEROS</ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item *ngIf=" isVisibleBancos ">
+        <ion-label color="primary" floating>Bancos:</ion-label>
+        <ion-select #item [(ngModel)]="idbanco" (ionChange)="onSelectChange('BANCOS',item)" >
+            <ion-option *ngFor="let idbanco of bancos" value="{{idbanco.value}}" >{{idbanco.text}}</ion-option>
+        </ion-select>
+    </ion-item>
+
+    <ion-item *ngIf=" isVisibleEmisor ">
+      <ion-label color="primary" fixed>Girador:</ion-label>
+      <ion-input [(ngModel)]="emisor" placeholder="Nombre del Emisor"></ion-input>
+    </ion-item>
+    
+    <ion-item *ngIf=" isVisibleCtaCheque ">
+      <ion-label color="primary" fixed>Cta. Cheque:</ion-label>
+      <ion-input [(ngModel)]="cta_cheque" type="number" placeholder="Ingrese # cuenta"></ion-input>
+    </ion-item>
+   
+    <ion-item *ngIf=" isVisibleNoCheque ">
+        <ion-label color="primary" fixed>No. Cheque:</ion-label>
+        <ion-input [(ngModel)]="numero_cheque" type="number" placeholder="Ingrese # Cheque"></ion-input>
+      </ion-item>
+  
+    <ion-item *ngIf=" isVisibleTarjeta ">
+        <ion-label color="primary" floating>Tarjeta:</ion-label>
+        <ion-select #item [(ngModel)]="idtarjeta" (ionChange)="onSelectChange('TARJETA',item)" >
+            <ion-option *ngFor="let idtarjeta of tarjetas" value="{{idtarjeta.value}}" >{{idtarjeta.text}}</ion-option>
+        </ion-select>
+    </ion-item>
+
+    <ion-item *ngIf=" isVisibleNoTarjeta ">
+      <ion-label color="primary" fixed>No. Tarjeta:</ion-label>
+      <ion-input [(ngModel)]="numero_tarjeta" type="number" placeholder="Ingrese # Tarjeta"></ion-input>
+    </ion-item>
+    
+    <ion-item *ngIf=" isVisibleNoRetencion ">
+      <ion-label color="primary" fixed>No. Retención:</ion-label>
+      <ion-input [(ngModel)]="numero_retencion" type="number" placeholder="Ingrese # Retención"></ion-input>
+    </ion-item>
+    
+    <ion-item *ngIf=" isVisibleNoLote ">
+      <ion-label color="primary" fixed>No. Lote:</ion-label>
+      <ion-input [(ngModel)]="numero_lote" type="number" placeholder="Ingrese # Lote"></ion-input>
+    </ion-item>
+
+    <ion-item *ngIf=" isVisibleValor ">
+      <ion-label color="primary" fixed>VALOR:</ion-label>
+      <ion-input [(ngModel)]="valor" type="number" placeholder="0.00" ></ion-input>
+    </ion-item>
+
+</ion-content>

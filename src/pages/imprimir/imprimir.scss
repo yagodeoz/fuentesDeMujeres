@@ -1,0 +1,12 @@
+page-imprimir {
+
+    ion-item [disabled] {
+        //background-color: #f8f8f8;
+        -webkit-text-fill-color: rgba(0, 0, 0, 1) !important;
+        -webkit-opacity: 1 !important;
+    }
+  
+    textarea.text-input {
+        font-size:25px !important;
+        }
+}

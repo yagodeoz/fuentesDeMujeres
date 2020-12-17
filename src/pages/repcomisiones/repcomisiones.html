@@ -1,0 +1,26 @@
+<!--
+  Generated template for the RepcomisionesPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Rep. Comisiones</ion-title>
+  </ion-navbar>
+  <ion-item>
+    <ion-label color="primary">Empresa:</ion-label>
+    <ion-select #item [(ngModel)]="empresa" (ionChange)="onSelectChange(item)" >
+        <ion-option *ngFor="let empresa of empresas" value="{{empresa.value}}" >{{empresa.text}}</ion-option>
+    </ion-select>
+  </ion-item>
+  <button ion-button>
+    <ion-icon name="search" (click)="obtenerInformacion()"> Ver Reporte </ion-icon>
+  </button>
+</ion-header>
+
+
+<ion-content padding>
+    <div [innerHTML]="theHtmlString"></div>
+</ion-content>
