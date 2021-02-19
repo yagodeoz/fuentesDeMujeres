@@ -10,6 +10,8 @@ import { PrincipalcobranzaPage } from '../pages/principalcobranza/principalcobra
 import { NuevacobranzaPage } from '../pages/nuevacobranza/nuevacobranza';
 import { SaldosclientesPage } from '../pages/saldosclientes/saldosclientes';
 import { CobroclientePage } from '../pages/cobrocliente/cobrocliente';
+import { NotasdecreditoPage} from "../pages/notasdecredito/notasdecredito";
+import { SaldonotascreditoPage} from "../pages/saldonotascredito/saldonotascredito";
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -35,7 +37,9 @@ import { AppUpdate } from '@ionic-native/app-update';
     NuevacobranzaPage,
     SaldosclientesPage,
     CobroclientePage,
-    RepcomisionesPage
+    RepcomisionesPage,
+    NotasdecreditoPage,
+    SaldonotascreditoPage
   ],
   imports: [
     BrowserModule,
@@ -52,7 +56,9 @@ import { AppUpdate } from '@ionic-native/app-update';
     NuevacobranzaPage,
     SaldosclientesPage,
     CobroclientePage,
-    RepcomisionesPage
+    RepcomisionesPage,
+    NotasdecreditoPage,
+    SaldonotascreditoPage
   ],
   providers: [
     StatusBar,

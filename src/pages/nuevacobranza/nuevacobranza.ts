@@ -18,7 +18,7 @@ import { CobroclientePage } from '../cobrocliente/cobrocliente';
   templateUrl: 'nuevacobranza.html',
 })
 export class NuevacobranzaPage {
-  
+
   filtro_empresa = null;
   filtro_cliente = null;
   nombre_empresa = null;
@@ -34,15 +34,15 @@ export class NuevacobranzaPage {
   displayProperty: string;
   title: string;
 
-  constructor(public navCtrl: NavController, 
-              public navParams: NavParams, 
-              public alertCtrl: AlertController, 
+  constructor(public navCtrl: NavController,
+              public navParams: NavParams,
+              public alertCtrl: AlertController,
               public tasksService: TasksServiceProvider,
               public beanSeguridad: BeanSeguridad,
               public loadingCtrl: LoadingController) {
-      
+
       this.filtro_empresa = navParams.get("empresa");
-      
+
       // If we navigated to this page, we will have an item available as a nav param
       this.selectedItem = navParams.get('item');
       this.displayProperty = navParams.get('displayProperty');
@@ -75,7 +75,7 @@ export class NuevacobranzaPage {
     }
   }
 
-  //Realiza la Busqueda de Clientes 
+  //Realiza la Busqueda de Clientes
   buscarCliente() {
 
       console.log("buscando...");
@@ -93,39 +93,39 @@ export class NuevacobranzaPage {
 
       let loading = this.loadingCtrl.create({ content: 'Obteniendo Información... <br><b>Por favor espere...</b>' });
       loading.present()
-      .then(() =>{ 
+      .then(() =>{
           //Obtengo la Informacion Requerida
           var cadenaSaldos="";
           this.items = [];
           this.tasksService.obtenerCarteraClientes({empresa:this.filtro_empresa, cliente:this.filtro_cliente})
-          .then(data => { 
-                        
+          .then(data => {
+
             //Carga de los registros
             for (let i = 0; i < data.length; i++) {
               //Genera la cadena de saldos
-              cadenaSaldos =  " • VENCIDO: $"+ data[i].VENCIDO + 
-                              " • X VENCER: $" + data[i].XVENCER; /*+ 
-                              " • A FAVOR: $" + data[i].AFAVOR + 
+              cadenaSaldos =  " • VENCIDO: $"+ data[i].VENCIDO +
+                              " • X VENCER: $" + data[i].XVENCER; /*+
+                              " • A FAVOR: $" + data[i].AFAVOR +
                               " • TOTAL: $" + data[i].TOTAL;*/
-              
+
               //Inserta el Registroa a Pantalla
               this.items.push({title:data[i].CODCLIENTE+" - "+data[i].NOMBRECLIENTE, note: cadenaSaldos, note2:" • A FAVOR: $" + data[i].AFAVOR + " • TOTAL: $" + data[i].TOTAL });
-            }    
+            }
             //Respaldo para la Busqueda por Filtro
             this.itemsRespaldo = this.items;
 
             //Cierra Espera
             loading.dismiss();
           })
-          .catch( error => { 
-            console.log("ERROR ==> " + JSON.stringify(error.json())); 
+          .catch( error => {
+            console.log("ERROR ==> " + JSON.stringify(error.json()));
 
             //Cierra Espera
             loading.dismiss();
           });
-      });    
+      });
   }
-  
+
 
   //Enlaza a la Pantalla de Visualizacion de Saldos
   verSaldos(item){
@@ -135,8 +135,8 @@ export class NuevacobranzaPage {
   }
 
   //Enlaza a la pantalla de Pagos Nuevos
-  iniciarPago(item){    
-    
+  iniciarPago(item){
+
       //Si es Nuevo - Y ya esta cerrado el dia
       let fechaActual:string = this.beanSeguridad.fechaActual().substring(0, 10);
       this.tasksService.obtenerCierreCobranzas(this.filtro_empresa, fechaActual)
@@ -179,7 +179,7 @@ export class NuevacobranzaPage {
                       }
                     },
                     {
-                      text: 'No', 
+                      text: 'No',
                       handler: () => {
                         console.log('No selected!');
                       }
@@ -188,12 +188,12 @@ export class NuevacobranzaPage {
                 });
                 confirm.present();
               }
-          });          
+          });
         }
       });
   }
 
-  
+
   ionViewDidLoad() {
     console.log('ionViewDidLoad NuevacobranzaPage');
     //this.buscarCliente();

@@ -10,6 +10,7 @@ import { SQLite } from '@ionic-native/sqlite';
 import { TasksServiceProvider } from '../providers/tasks-service/tasks-service';
 import { RepcomisionesPage } from '../pages/repcomisiones/repcomisiones';
 import { BeanSeguridad } from '../providers/seguridad/seguridadApp';
+import { NotasdecreditoPage} from '../pages/notasdecredito/notasdecredito';
 
 @Component({
   templateUrl: 'app.html',
@@ -42,7 +43,7 @@ export class MyApp {
       { title: 'Cobranzas', component: PrincipalcobranzaPage, icon:"calculator", id:"2" },
       { title: 'Rep. Cumplimiento', component: RepcomisionesPage, icon:"podium", id:"3" },
       { title: 'Actualizar Inform.', component: null, icon:"refresh", id:"4" },
-      {title: 'Generar nota credito',component:null,icon:"archive",id:"5"}
+      { title: 'Generar nota credito',component:NotasdecreditoPage,icon:"archive",id:"5"}
       //{ title: 'Salir', component: ListPage, icon:"log-out", id:"10" }
     ];
   }
@@ -66,7 +67,8 @@ export class MyApp {
 
     //Validacion de actualizacion  Diaria
     var fechaActualizacion = this.beanSeguridad.FECHASINCRONIZADO || null;
-    if((fechaActualizacion == null || "" == fechaActualizacion.trim()) && page.id != "4"){
+    if((fechaActualizacion == null || "" == fechaActualizacion.trim()) && page.id != "4"){//VTAMA ORIGINALMENTE VA 4 SE CAMBIA POR PRUEBAS A 5
+    //if(page.id!= "4" || page.id!="5"){
       let alert = this.alertCtrl.create({
         title: 'Atención',
         subTitle: 'El Sistema necesita que se Actualice su Información antes de empezar su operación.',

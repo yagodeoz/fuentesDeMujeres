@@ -9,7 +9,7 @@ import 'moment/locale/es';
 export class BeanSeguridad {
 
     //Constantes
-    public isAMBIENTE_PROD:boolean = true;
+    public isAMBIENTE_PROD:boolean = false;
     private URL_DESA:string = "http://192.168.204.15:8081/MyBusinessWeb/servlet/SWSIntegracionesApp?";
     private URL_PROD:string = "https://www.dmujeres.com.ec:8443/MyBusinessWeb/servlet/SWSIntegracionesApp?";
     public urlServicioReportes = "https://www.dmujeres.com.ec:8443/MyBusinessWeb/servlet/ServicioTransporteReportes";
@@ -20,7 +20,7 @@ export class BeanSeguridad {
     public USUARIO_LOGONEADO:string = "-";
     public NOMBRE_USUARIO:string = "-";
     public SINCRONIZADO:boolean = true;
-    public FECHASINCRONIZADO = "01/01/2018 00:01";
+    public FECHASINCRONIZADO = "01/05/2020 00:01";
     public EN_LINEA:boolean = true;
     public EMPRESAS:any = {};
 
@@ -98,9 +98,36 @@ export class BeanSeguridad {
         .then(() => loading.setContent('Actualizando Información Cobranzas<b>(3/3)... <br>Por favor espere...</b>' ))
         //.then(() => this.actualizarCobros(0))
         .then(() => this.actualizarParametros())
-        //Actualizar Usuario
+
+          //VTAMA
+          //actualizar parametros NC
+        //.then(()=>this.actualizaParametrosNC())
+
+          //Actualizar Usuario
         .then(() => this.validaSincronizacion())
-        //Cierre Espera
+          //VTAMA 11-01-2021
+          //Cabecera facturas para nota de credito
+          .then(() => loading.setContent('Actualizando Información Nota de Crédito<b>(1/3)... <br>Por favor espere...</b>' ))
+          .then(() => this.tasksService.eliminarTabla(this.tasksService.TABLA_SOLICITUDESNC))
+          .then(() => this.tasksService.crearTabla(this.tasksService.TABLA_SOLICITUDESNC))
+
+
+          //VTAMA 11-01-2021
+          .then(() => loading.setContent('Actualizando Información Nota de Crédito<b>(2/3)... <br>Por favor espere...</b>' ))
+          .then(() => this.tasksService.eliminarTabla(this.tasksService.TABLA_FACNOTACREDITOCAB))
+          .then(() => this.tasksService.crearTabla(this.tasksService.TABLA_FACNOTACREDITOCAB))
+          .then(() => this.actualizarFacturasNotaCredito(0))
+
+
+          //VTAMA 21-01-2021
+          .then(() => loading.setContent('Actualizando Información Nota de Crédito<b>(3/3)... <br>Por favor espere...</b>' ))
+          .then(() => this.tasksService.eliminarTabla(this.tasksService.TABLA_FACNOTACREDITODET))
+          .then(() => this.tasksService.crearTabla(this.tasksService.TABLA_FACNOTACREDITODET))
+          .then(() => this.actualizarDetallesFacNotaCredito(0))
+
+
+
+          //Cierre Espera
         .then(() => loading.dismiss())
         //Refrescar Pantalla
         //.then(() => location.reload());
@@ -196,6 +223,106 @@ export class BeanSeguridad {
             });
         })
     }
+    /*** VTAMA ACTUALIZA FACTURAS PARA NOTAS DE CREDITO*/
+    //VTAMA 11-01-2021
+  actualizarFacturasNotaCredito(indice:any){
+
+    //Variables
+    let parametroWS:any;
+    let respuestaWS:any;
+    let sqlGeneral = 'INSERT OR REPLACE INTO [TABLA]([CAMPOS]) VALUES([VALORES]);';
+    var sqlInsert:Array<string>= [];
+
+    return new Promise((resolve, reject) => {
+
+      console.log("OBTENER_CARTERA_CAB ==> " + indice);
+      parametroWS = {indice:indice};
+      this.obtenerInformacionWS("OBTENER_FAC_NOTACREDITO_CAB", parametroWS)
+        .then(data => {
+          respuestaWS = data;
+
+          if(respuestaWS.exito == "true"){
+            //Evaluo si es final de la actualizacion
+            console.log("respuestaWS ==> " + respuestaWS.cantidad_registros + " loopExit: " + respuestaWS.final);
+
+            //Inserta los Registros Obtenidos
+            if((respuestaWS.cantidad_registros * 1) > 0){
+              //Ajuste del query de insercion
+              sqlGeneral = sqlGeneral.replace('[TABLA]',this.tasksService.TABLA_FACNOTACREDITOCAB)
+              sqlGeneral = sqlGeneral.replace('[CAMPOS]',"CODEMPRESA,CODCLIENTE,DATOS_CLIENTE,TIPOCLIENTE,CODAGENCIA,CODTIPOCMPR,NUMCMPRVENTA,NUMDOCUMENTO,VENDEDOR,"+
+                                                                  "SUBTOTAL,DESCUENTO,IMPUESTO,TOTAL,FECHAREGISTRO,CODAGENCIACXC,CODTIPOCMPRCXC,NUMCXCDOCUMENTOCXC,FECHAVCTO,"+
+                                                                  "VALORDOC,SALDODOC");
+
+              //console.log("sqlGeneral ==> " + sqlGeneral);
+              for(let i = 0; i < (respuestaWS.cantidad_registros * 1); i++)
+              {
+
+                sqlInsert.push(sqlGeneral.replace('[VALORES]',"\""+respuestaWS.data[i].CODEMPRESA+"\","+
+                  "\""+respuestaWS.data[i].CODCLIENTE+"\","+
+                  "\""+respuestaWS.data[i].DATOS_CLIENTE+"\","+
+                  "\""+respuestaWS.data[i].TIPOCLIENTE+"\","+
+                  "\""+respuestaWS.data[i].CODAGENCIA+"\","+
+                  "\""+respuestaWS.data[i].CODTIPOCMPR+"\","+
+                  "\""+respuestaWS.data[i].NUMCMPRVENTA+"\","+
+                  "\""+respuestaWS.data[i].NUMDOCUMENTO+"\","+
+                  "\""+respuestaWS.data[i].VENDEDOR+"\","+
+                  "\""+respuestaWS.data[i].SUBTOTAL+"\","+
+                  "\""+respuestaWS.data[i].DESCUENTO+"\","+
+                  "\""+respuestaWS.data[i].IMPUESTO+"\","+
+                  "\""+respuestaWS.data[i].TOTAL+"\","+
+                  "\""+respuestaWS.data[i].FECHAREGISTRO+"\","+
+                  "\""+respuestaWS.data[i].CODAGENCIACXC+"\","+
+                  "\""+respuestaWS.data[i].CODTIPOCMPRCXC+"\","+
+                  "\""+respuestaWS.data[i].NUMCXCDOCUMENTOCXC+"\","+
+                  "\""+respuestaWS.data[i].FECHAVCTO+"\","+
+                  "\""+respuestaWS.data[i].VALORDOC+"\","+
+                  "\""+respuestaWS.data[i].SALDODOC+"\""
+                ));
+              }
+
+              //Envio a Insertar en batch los registros obtenidos
+              this.tasksService.db.sqlBatch(sqlInsert)
+                .then(() => {
+                  console.log('Imported TABLA_FACNOTACREDITOCAB #'+indice);
+                  sqlInsert = [];
+                })
+                .catch(e => console.error(e));
+
+              //Vuelve a llamar al Proceso - Si aun no termina la interaccion
+              if(respuestaWS.final != "true"){
+                this.actualizarFacturasNotaCredito(indice+1)
+                  .then(data => {
+                    console.log("Proceso Ejecutado");
+                    //Retorno Respuesta
+                    resolve(respuestaWS);
+                  })
+                  .catch( error => { console.log("ERROR ==> " + JSON.stringify(error.json())); });
+              }else{
+                //Retorno Respuesta
+                resolve(respuestaWS);
+              }
+            }else{
+              resolve(respuestaWS);
+            }
+
+          }else{
+            let alert = this.alertCtrl.create({
+              title: 'Atención',
+              subTitle: ' Error ==> '+respuestaWS.mensaje,
+              buttons: ["Aceptar"]
+            });
+            alert.present();
+          }
+
+          //Retorno Respuesta
+          //resolve(respuestaWS);
+        })
+        .catch( error => {
+          //console.log("ERROR ==> " + JSON.stringify(error.json()));
+          reject(error.json());
+        });
+    })
+  }
 
     actualizarCobros(indice:any){
 
@@ -360,6 +487,105 @@ export class BeanSeguridad {
         })
     }
 
+  /*** VTAMA ACTUALIZAR DETALLES FACTURA NOTA DE CREDITO */
+  //VTAMA 11-01-2021
+  actualizarDetallesFacNotaCredito(indice:any){
+
+    //Variables
+    let parametroWS:any;
+    let respuestaWS:any;
+    let sqlGeneral = 'INSERT OR REPLACE INTO [TABLA]([CAMPOS]) VALUES([VALORES]);';
+    var sqlInsert:Array<string>= [];
+
+    return new Promise((resolve, reject) => {
+
+    parametroWS = {indice:indice};
+      this.obtenerInformacionWS("OBTENER_FAC_NOTACREDITO_DET", parametroWS)
+        .then(data => {
+          respuestaWS = data;
+
+          if(respuestaWS.exito == "true"){
+
+            console.log("respuestaWS ==> " + respuestaWS.cantidad_registros + " loopExit: " + respuestaWS.final);
+
+            //Inserta los Registros Obtenidos
+            if((respuestaWS.cantidad_registros * 1) > 0){
+              //Ajuste del query de insercion
+              sqlGeneral = sqlGeneral.replace('[TABLA]',this.tasksService.TABLA_FACNOTACREDITODET)
+              sqlGeneral = sqlGeneral.replace('[CAMPOS]',"CODAGENCIA,CODTIPOCMPR,NUMCMPRVENTA,NUMCMPRVENTADET,ARTICULO,COSTO,CANTIDAD,PRECIO,SUBTOTAL,DESCUENTO,"+
+                                                                              "PORCDESCUENTO,IMPUESTO,PORCIMPUESTO,TOTAL,ESPREMIOOPROMOCION,CANTIDADDEVUELTA,"+
+                                                                              "NUMCMPRVENTADETAPLICA,CODARTICULO,CANTIDADNOCONFORME");
+
+              for(let i = 0; i < (respuestaWS.cantidad_registros * 1); i++)
+              {
+                sqlInsert.push(sqlGeneral.replace('[VALORES]',"\""+respuestaWS.data[i].CODAGENCIA+"\","+
+                                                      "\""+respuestaWS.data[i].CODTIPOCMPR+"\","+
+                                                      "\""+respuestaWS.data[i].NUMCMPRVENTA+"\","+
+                                                      "\""+respuestaWS.data[i].NUMCMPRVENTADET+"\","+
+                                                      "\""+respuestaWS.data[i].ARTICULO+"\","+
+                                                      "\""+respuestaWS.data[i].COSTO+"\","+
+                                                      "\""+respuestaWS.data[i].CANTIDAD+"\","+
+                                                      "\""+respuestaWS.data[i].PRECIO+"\","+
+                                                      "\""+respuestaWS.data[i].SUBTOTAL+"\","+
+                                                      "\""+respuestaWS.data[i].DESCUENTO+"\","+
+                                                      "\""+respuestaWS.data[i].PORCDESCUENTO+"\","+
+                                                      "\""+respuestaWS.data[i].IMPUESTO+"\","+
+                                                      "\""+respuestaWS.data[i].PORCIMPUESTO+"\","+
+                                                      "\""+respuestaWS.data[i].TOTAL+"\","+
+                                                      "\""+respuestaWS.data[i].ESPREMIOOPROMOCION+"\","+
+                                                      "\""+respuestaWS.data[i].CANTIDADDEVUELTA+"\","+
+                                                      "\""+respuestaWS.data[i].NUMCMPRVENTADETAPLICA+"\","+
+                                                      "\""+respuestaWS.data[i].CODARTICULO+"\","+
+                                                      "\""+respuestaWS.data[i].CANTIDADNOCONFORME+"\"" ));
+              }
+
+              //Envio a Insertar en batch los registros obtenidos
+              this.tasksService.db.sqlBatch(sqlInsert)
+                .then(() => {
+                  console.log('Imported TABLA_FACNOTACREDITODET #'+indice);
+                  sqlInsert = [];
+                })
+                .catch(e => console.error(e));
+
+              //Vuelve a llamar al Proceso
+              if(respuestaWS.final != "true"){
+                this.actualizarDetallesFacNotaCredito(indice+1)
+                  .then(data => {
+                    console.log("Proceso Ejecutado");
+                    //Retorno Respuesta
+                    resolve(respuestaWS);
+                  })
+                  .catch( error => { console.log("ERROR ==> " + JSON.stringify(error.json())); });
+              }else{
+                //Retorno Respuesta
+                resolve(respuestaWS);
+              }
+
+            }else{
+              //Terminado
+              resolve(respuestaWS);
+            }
+
+          }else{
+            let alert = this.alertCtrl.create({
+              title: 'Atención',
+              subTitle: ' Error ==> '+respuestaWS.mensaje,
+              buttons: ["Aceptar"]
+            });
+            alert.present();
+          }
+
+          //Retorno Respuesta
+          //resolve(respuestaWS);
+
+        })
+        .catch( error => {
+          console.log("ERROR ==> " + JSON.stringify(error.json()));
+          reject(error.json());
+        });
+    })
+  }
+
 
     //*** ACTUALIZAR PARAMETROS *****
     actualizarParametros(){
@@ -378,10 +604,12 @@ export class BeanSeguridad {
             if(respuestaWS.exito == "true"){
                 //Parametros
                 this.tasksService.insertarRegistros(this.tasksService.TABLA_COBPARAMETROS,{CODPARAMETRO:"FORMASPAGO", VALOR:JSON.stringify(respuestaWS.formaspago)})
-                .then(() =>  this.tasksService.insertarRegistros(this.tasksService.TABLA_COBPARAMETROS,{CODPARAMETRO:"BANCOS", VALOR:JSON.stringify(respuestaWS.bancos)}))
-                .then(() =>  this.tasksService.insertarRegistros(this.tasksService.TABLA_COBPARAMETROS,{CODPARAMETRO:"TARJETAS", VALOR:JSON.stringify(respuestaWS.tarjetas)}))
-                .then(() =>  this.tasksService.insertarRegistros(this.tasksService.TABLA_COBPARAMETROS,{CODPARAMETRO:"CUENTAS", VALOR:JSON.stringify(respuestaWS.cuentas)}))
-                .then(() =>  resolve(respuestaWS));
+                  .then(() =>  this.tasksService.insertarRegistros(this.tasksService.TABLA_COBPARAMETROS,{CODPARAMETRO:"BANCOS", VALOR:JSON.stringify(respuestaWS.bancos)}))
+                  .then(() =>  this.tasksService.insertarRegistros(this.tasksService.TABLA_COBPARAMETROS,{CODPARAMETRO:"TARJETAS", VALOR:JSON.stringify(respuestaWS.tarjetas)}))
+                  .then(() =>  this.tasksService.insertarRegistros(this.tasksService.TABLA_COBPARAMETROS,{CODPARAMETRO:"CUENTAS", VALOR:JSON.stringify(respuestaWS.cuentas)}))
+                  .then(() =>  this.tasksService.insertarRegistros(this.tasksService.TABLA_COBPARAMETROS,{CODPARAMETRO:"MODULOSNC", VALOR:JSON.stringify(respuestaWS.modulosnc)}))//VTAMA
+                  .then(() =>  this.tasksService.insertarRegistros(this.tasksService.TABLA_COBPARAMETROS,{CODPARAMETRO:"TIPOSNC", VALOR:JSON.stringify(respuestaWS.tiposnc)}))//VTAMA
+                  .then(() =>  resolve(respuestaWS));
             }else{
                 let alert = this.alertCtrl.create({
                 title: 'Atención',
@@ -444,6 +672,43 @@ export class BeanSeguridad {
             });
         })
     }
+
+    //VTAMA
+   actualizaParametrosNC(){
+
+     //Variables
+     let parametroWS:any;
+     let respuestaWS:any;
+
+     return new Promise((resolve, reject) => {
+
+       //parametroWS = "&codusuario="+this.beanSeguridad.USUARIO_LOGONEADO;
+       parametroWS = {};
+       this.obtenerInformacionWS("PARAMETROS_MODULO_NC", parametroWS)
+         .then(data => {
+           respuestaWS = data;
+
+           if(respuestaWS.exito == "true"){
+             //Parametros
+                 this.tasksService.insertarRegistros(this.tasksService.TABLA_NC_MODULOSNC,{CODPARAMETRO:"MODULONC", VALOR:JSON.stringify(respuestaWS.ModulosNC)})
+
+               .then(() =>  resolve(respuestaWS));
+           }else{
+             let alert = this.alertCtrl.create({
+               title: 'Atención',
+               subTitle: ' Error ==> '+respuestaWS.mensaje,
+               buttons: ["Aceptar"]
+             });
+             alert.present();
+           }
+
+         })
+         .catch( error => {
+           console.log("ERROR ==> " + JSON.stringify(error.json()));
+           reject(error.json());
+         });
+     })
+   }
 
 
 }

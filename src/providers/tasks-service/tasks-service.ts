@@ -20,7 +20,16 @@ export class TasksServiceProvider {
   public TABLA_COBCARTERADET = "COBCARTERADET";
   public TABLA_COBRECIBOCAB  = "COBRECIBOCAB";
   public TABLA_COBCIERRE     = "COBCIERRE";
-  
+  //VTAMA
+  public TABLA_NC_MODULOSNC = "GENMODULOSNC";
+  public TABLA_NC_TIPOSNC = "GENTIPOSNOTACREDITO";
+  //VTAMA
+  public TABLA_FACNOTACREDITOCAB = "FACNOTACREDITOCAB";
+  public TABLA_FACNOTACREDITODET = "FACNOTACREDITODET";
+  //VTAMA
+  public TABLA_SOLICITUDESNC = "SOLICITUDESNC";
+
+
   //Creacion Tablas
   public SQL_COBPARAMETROS  = 'CREATE TABLE IF NOT EXISTS '+this.TABLA_COBPARAMETROS+'('
                           +'CODPARAMETRO TEXT PRIMARY KEY, '
@@ -36,8 +45,8 @@ export class TasksServiceProvider {
  public SQL_COBCARTERACAB = 'CREATE TABLE IF NOT EXISTS '+this.TABLA_COBCARTERACAB+'('
                           +'CODEMPRESA TEXT, '
                           +'CODCLIENTE TEXT, '
-                          +'NOMBRECLIENTE TEXT, ' 
-                          +'EMAILCLIENTE TEXT, ' 
+                          +'NOMBRECLIENTE TEXT, '
+                          +'EMAILCLIENTE TEXT, '
                           +'CODIGOVENDEDOR TEXT, '
                           +'USUARIOVENDEDOR TEXT, '
                           +'VENCIDO TEXT, '
@@ -51,10 +60,10 @@ export class TasksServiceProvider {
                           +'REFERENCIA TEXT,  '
                           +'VENDEDOR TEXT,  '
                           +'NUMCUOTA TEXT, '
-                          +'NUMDOCUMENTO TEXT, '                          
+                          +'NUMDOCUMENTO TEXT, '
                           +'FECHAEMISION TEXT, '
                           +'DIASFEMISION TEXT, '
-                          +'VALORCUOTA TEXT, ' 
+                          +'VALORCUOTA TEXT, '
                           +'VALORCHEQUE TEXT, '
                           +'VALORSALDO TEXT, '
                           +'ORDENAMIENTO INTEGER, '
@@ -79,6 +88,69 @@ export class TasksServiceProvider {
                            +'NUMDEPOSITO TEXT, '
                            +'VALOR TEXT, '
                            +'DETALLECIERRE TEXT)';
+  //VTAMA
+  public SQL_GENMODULOSNC = 'CREATE TABLE IF NOT EXISTS '+this.TABLA_NC_MODULOSNC+'('
+                            +'CODMODULO TEXT,'
+                            +'DESC_MODULO TEXT)';
+
+  public SQL_GENTIPOSNOTACREDITO = 'CREATE TABLE IF NOT EXISTS '+this.TABLA_NC_TIPOSNC+'('
+                                    +'TIPONC TEXT, '
+                                    +'DESC_TIPO_NC TEXT, '
+                                    +'MODULO TEXT)';
+  //VTAMA
+  public SQL_FACNOTACREDITOCAB = 'CREATE TABLE IF NOT EXISTS '+this.TABLA_FACNOTACREDITOCAB+'('
+                                  +'CODEMPRESA TEXT,'
+                                  +'CODCLIENTE TEXT,'
+                                  +'DATOS_CLIENTE TEXT,'
+                                  +'TIPOCLIENTE TEXT,'
+                                  +'CODAGENCIA TEXT,'
+                                  +'CODTIPOCMPR TEXT,'
+                                  +'NUMCMPRVENTA TEXT,'
+                                  +'NUMDOCUMENTO TEXT,'
+                                  +'VENDEDOR TEXT,'
+                                  +'SUBTOTAL TEXT,'
+                                  +'DESCUENTO TEXT,'
+                                  +'IMPUESTO TEXT,'
+                                  +'TOTAL TEXT,'
+                                  +'FECHAREGISTRO TEXT,'
+                                  +'CODAGENCIACXC TEXT,'
+                                  +'CODTIPOCMPRCXC TEXT,'
+                                  +'NUMCXCDOCUMENTOCXC TEXT,'
+                                  +'FECHAVCTO TEXT,'
+                                  +'VALORDOC TEXT,'
+                                  +'SALDODOC TEXT)';
+  //VTAMA
+  public SQL_FACNOTACREDITODET = 'CREATE TABLE IF NOT EXISTS '+this.TABLA_FACNOTACREDITODET+'('
+                                  +'IDFACNC INTEGER PRIMARY KEY,'
+                                  +'CODAGENCIA TEXT,'
+                                  +'CODTIPOCMPR TEXT,'
+                                  +'NUMCMPRVENTA TEXT,'
+                                  +'NUMCMPRVENTADET TEXT,'
+                                  +'ARTICULO TEXT,'
+                                  +'COSTO TEXT,'
+                                  +'CANTIDAD TEXT,'
+                                  +'PRECIO TEXT,'
+                                  +'SUBTOTAL TEXT,'
+                                  +'DESCUENTO TEXT,'
+                                  +'PORCDESCUENTO TEXT,'
+                                  +'IMPUESTO TEXT,'
+                                  +'PORCIMPUESTO TEXT,'
+                                  +'TOTAL TEXT,'
+                                  +'ESPREMIOOPROMOCION TEXT,'
+                                  +'CANTIDADDEVUELTA TEXT,'
+                                  +'NUMCMPRVENTADETAPLICA TEXT,'
+                                  +'CODARTICULO TEXT,'
+                                  +'CANTIDADNOCONFORME TEXT )';
+  //VTAMA
+  public SQL_SOLICITUDESNC = 'CREATE TABLE IF NOT EXISTS '+this.TABLA_SOLICITUDESNC+'('
+                              +'CODEMPRESA TEXT,'
+                              +'TIPONOTACREDITO TEXT, '
+                              +'FECHA TEXT,'
+                              +'CODUSUARIO TEXT,'
+                              +'CLIENTE TEXT,'
+                              +'DETALLESNC TEXT,'
+                              +'CODESTADO TEXT,'
+                              +'FECRESP_MWB TEXT )';
 
 
   constructor() {}
@@ -89,7 +161,7 @@ export class TasksServiceProvider {
     }
   }
 
-  //CREACION DE TABLAS BASE DE DATOS 
+  //CREACION DE TABLAS BASE DE DATOS
   inicializarBaseDatos(){
 
     //Creacion de tablas
@@ -99,6 +171,12 @@ export class TasksServiceProvider {
     this.crearTabla(this.TABLA_COBCARTERADET);
     this.crearTabla(this.TABLA_COBRECIBOCAB);
     this.crearTabla(this.TABLA_COBCIERRE);
+    //VTAMA
+    this.crearTabla(this.TABLA_NC_MODULOSNC);
+    this.crearTabla(this.TABLA_NC_TIPOSNC);
+    this.crearTabla(this.TABLA_FACNOTACREDITOCAB);
+    this.crearTabla(this.TABLA_FACNOTACREDITODET);
+    this.crearTabla(this.TABLA_SOLICITUDESNC);
 
     //Retorno al final de las ejecuciones
     return true;
@@ -114,7 +192,7 @@ export class TasksServiceProvider {
   delete(task: any){
     let sql = 'DELETE FROM tasks WHERE id=?';
     return this.db.executeSql(sql, [task.id]);
-  } 
+  }
 
   getAll(){
     let sql = 'SELECT * FROM tasks';
@@ -127,14 +205,14 @@ export class TasksServiceProvider {
       return Promise.resolve( tasks );
     })
     .catch(error => Promise.reject(error));
-  } 
+  }
   */
 
- 
+
 
   //IFLORES - ingresa los Resgitros a la tabla descrita
   insertarRegistros(tabla:string, registro: any){
-    
+
     let sql = 'INSERT OR REPLACE INTO [TABLA]([CAMPOS]) VALUES([VALORES])';
     let valores = null;
 
@@ -155,7 +233,7 @@ export class TasksServiceProvider {
       sql = sql.replace('[VALORES]',"?,?,?,?,?");
 
       console.log("sql ==> "+sql);
-      valores = [registro.CODUSUARIO, 
+      valores = [registro.CODUSUARIO,
                  registro.NOMBRE,
                  registro.CLAVE,
                  registro.CLIENTESTODOS,
@@ -169,11 +247,11 @@ export class TasksServiceProvider {
                                    "USUARIOVENDEDOR, VENCIDO, XVENCER, AFAVOR, TOTAL");
       sql = sql.replace('[VALORES]',"?,?,?,?,?,?,?,?,?,?");
 
-      valores = [registro.CODEMPRESA, 
+      valores = [registro.CODEMPRESA,
                  registro.CODCLIENTE,
                  registro.NOMBRECLIENTE,
                  registro.EMAILCLIENTE,
-                 registro.CODIGOVENDEDOR, 
+                 registro.CODIGOVENDEDOR,
                  registro.USUARIOVENDEDOR,
                  registro.VENCIDO,
                  registro.XVENCER,
@@ -189,14 +267,14 @@ export class TasksServiceProvider {
                                    "VALORCHEQUE, VALORSALDO, ORDENAMIENTO, VALORXAPLICAR ");
       sql = sql.replace('[VALORES]',"?,?,?,?,?,?,?,?,?,?,?,?");
 
-      valores = [registro.CODEMPRESA, 
+      valores = [registro.CODEMPRESA,
                  registro.CODCLIENTE,
                  registro.REFERENCIA,
                  registro.NUMCUOTA,
                  registro.NUMDOCUMENTO,
-                 registro.FECHAEMISION, 
+                 registro.FECHAEMISION,
                  registro.DIASFEMISION,
-                 registro.VALORCUOTA, 
+                 registro.VALORCUOTA,
                  registro.VALORCHEQUE,
                  registro.VALORSALDO,
                  registro.ORDENAMIENTO,
@@ -209,7 +287,7 @@ export class TasksServiceProvider {
       sql = sql.replace('[CAMPOS]',"CODEMPRESA, IDRECIBO, FECHA, CODUSUARIO, CODCLIENTE, NOMBRECLIENTE,"+
                                    "VALORPAGO, DETALLESPAGO, DETALLESDOCU, CODESTADO");
       sql = sql.replace('[VALORES]',"?,?,?,?,?,?,?,?,?,?");
-      valores = [registro.CODEMPRESA, 
+      valores = [registro.CODEMPRESA,
                  registro.IDRECIBO,
                  registro.FECHA,
                  registro.CODUSUARIO,
@@ -226,16 +304,102 @@ export class TasksServiceProvider {
       sql = sql.replace('[TABLA]',this.TABLA_COBCIERRE);
       sql = sql.replace('[CAMPOS]',"CODEMPRESA, IDCIERRE, BANCO, NUMDEPOSITO, VALOR, DETALLECIERRE");
       sql = sql.replace('[VALORES]',"?,?,?,?,?,?");
-      valores = [registro.CODEMPRESA, 
+      valores = [registro.CODEMPRESA,
                  registro.IDCIERRE,
                  registro.BANCO,
                  registro.NUMDEPOSITO,
                  registro.VALOR,
                  registro.DETALLECIERRE];
     }
+    //VTAMA
+    if(this.TABLA_NC_MODULOSNC == tabla){
+      sql = sql.replace('[TABLA]',this.TABLA_NC_MODULOSNC);
+      sql = sql.replace('[CAMPOS]',"CODMODULO,DESC_MODULO");
+      sql = sql.replace('[VALORES]',"?,?");
+      valores = [registro.CODMODULO,
+                 registro.DESC_MODULO];
+    }
+
+    if(this.TABLA_NC_TIPOSNC == tabla){
+      sql = sql.replace('[TABLA]',this.TABLA_NC_TIPOSNC);
+      sql = sql.replace('[CAMPOS]',"TIPONC,DESC_TIPO_NC,MODULO");
+      sql = sql.replace('[VALORES]',"?,?,?");
+      valores = [registro.TIPONC,
+                 registro.DESC_TIPO_NC,
+                 registro.MODULO];
+    }
+    if(this.TABLA_FACNOTACREDITOCAB == tabla){
+      sql = sql.replace('[TABLA]',this.TABLA_FACNOTACREDITOCAB);
+      sql = sql.replace('[CAMPOS]',"CODEMPRESA,CODCLIENTE,DATOS_CLIENTE,TIPOCLIENTE,CODAGENCIA,CODTIPOCMPR,NUMCMPRVENTA,NUMDOCUMENTO,VENDEDOR,"+
+                                                        "SUBTOTAL,DESCUENTO,IMPUESTO,TOTAL,FECHAREGISTRO,CODAGENCIACXC,CODTIPOCMPRCXC,NUMCXCDOCUMENTOCXC,FECHAVCTO,"+
+                                                        "VALORDOC,SALDODOC");
+      sql = sql.replace('[VALORES]',"?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?");
+      valores = [registro.CODEMPRESA,
+                registro.CODCLIENTE,
+                registro.DATOS_CLIENTE,
+                registro.TIPOCLIENTE,
+                registro.CODAGENCIA,
+                registro.CODTIPOCMPR,
+                registro.NUMCMPRVENTA,
+                registro.NUMDOCUMENTO,
+                registro.VENDEDOR,
+                registro.SUBTOTAL,
+                registro.DESCUENTO,
+                registro.IMPUESTO,
+                registro.TOTAL,
+                registro.FECHAREGISTRO,
+                registro.CODAGENCIACXC,
+                registro.CODTIPOCMPRCXC,
+                registro.NUMCXCDOCUMENTOCXC,
+                registro.FECHAVCTO,
+                registro.VALORDOC,
+                registro.SALDODOC];
+    }
+
+    //VTAMA
+    if(this.TABLA_FACNOTACREDITODET == tabla){
+      sql = sql.replace('[TABLA]',this.TABLA_FACNOTACREDITODET);
+      sql = sql.replace('[CAMPOS]',"CODAGENCIA,CODTIPOCMPR,NUMCMPRVENTA,NUMCMPRVENTADET,ARTICULO,COSTO,CANTIDAD,PRECIO,SUBTOTAL,DESCUENTO," +
+                                                        "PORCDESCUENTO,IMPUESTO,PORCIMPUESTO,TOTAL,ESPREMIOOPROMOCION,CANTIDADDEVUELTA," +
+                                                        "NUMCMPRVENTADETAPLICA,CODARTICULO,CANTIDADNOCONFORME");
+
+      sql = sql.replace('[VALORES]',"?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?");
+      valores = [registro.CODAGENCIA,
+                  registro.CODTIPOCMPR,
+                  registro.NUMCMPRVENTA,
+                  registro.NUMCMPRVENTADET,
+                  registro.ARTICULO,
+                  registro.COSTO,
+                  registro.CANTIDAD,
+                  registro.PRECIO,
+                  registro.SUBTOTAL,
+                  registro.DESCUENTO,
+                  registro.PORCDESCUENTO,
+                  registro.IMPUESTO,
+                  registro.PORCIMPUESTO,
+                  registro.TOTAL,
+                  registro.ESPREMIOOPROMOCION,
+                  registro.CANTIDADDEVUELTA,
+                  registro.NUMCMPRVENTADETAPLICA,
+                  registro.CODARTICULO,
+                  registro.CANTIDADNOCONFORME];
+    }
+    if(this.TABLA_SOLICITUDESNC == tabla){
+      sql = sql.replace('[TABLA]',this.TABLA_SOLICITUDESNC);
+      sql = sql.replace('[CAMPOS]',"CODEMPRESA,TIPONOTACREDITO,FECHA,CODUSUARIO,CLIENTE,DETALLESNC,CODESTADO,FECRESP_MWB");
+      sql = sql.replace('[VALORES]',"?,?,?,?,?,?,?,?");
+      valores = [registro.CODEMPRESA,
+        registro.TIPONOTACREDITO,
+        registro.FECHA,
+        registro.CODUSUARIO,
+        registro.CLIENTE,
+        registro.DETALLESNC,
+        registro.CODESTADO,
+        registro.FECRESP_MWB];
+    }
 
     console.log("sql ==> "+sql);
-    return this.db.executeSql(sql, valores);   
+    return this.db.executeSql(sql, valores);
   }
 
 
@@ -262,7 +426,7 @@ export class TasksServiceProvider {
   crearTabla(tabla:string){
 
     let sql = "";
-    
+
     if(this.TABLA_COBPARAMETROS== tabla){
       sql = this.SQL_COBPARAMETROS;
     }
@@ -291,9 +455,26 @@ export class TasksServiceProvider {
     if(this.TABLA_COBCIERRE == tabla){
       sql = this.SQL_COBCIERRE;
     }
-  
+
+    //VTAMA
+    if(this.TABLA_NC_MODULOSNC == tabla){
+      sql = this.SQL_GENMODULOSNC;
+    }
+    if(this.TABLA_NC_TIPOSNC == tabla){
+      sql = this.SQL_GENTIPOSNOTACREDITO;
+    }
+    if(this.TABLA_FACNOTACREDITOCAB == tabla){
+      sql = this.SQL_FACNOTACREDITOCAB;
+    }
+    if (this.TABLA_FACNOTACREDITODET == tabla){
+      sql = this.SQL_FACNOTACREDITODET;
+    }
+    if (this.TABLA_SOLICITUDESNC == tabla){
+      sql = this.SQL_SOLICITUDESNC;
+    }
+
     console.log("sql ==> "+sql);
-    return this.db.executeSql(sql,[]);   
+    return this.db.executeSql(sql,[]);
   }
 
    //Iflores - Eliminar tabla
@@ -301,14 +482,14 @@ export class TasksServiceProvider {
     //Elimina Tabla
     let sql = 'DROP TABLE IF EXISTS '+tabla;
     console.log("sql ==> "+sql);
-    return this.db.executeSql(sql,[]);   
+    return this.db.executeSql(sql,[]);
   }
 
   //Iflores - Limpiar tabla
   encerarTabla(tabla:string){
     let sql = 'DELETE FROM '+tabla;
     console.log("sql ==> "+sql);
-    return this.db.executeSql(sql,[]);   
+    return this.db.executeSql(sql,[]);
   }
 
   //Iflores - Actualizar Usuario Conexion
@@ -317,7 +498,7 @@ export class TasksServiceProvider {
     console.log("sql ==> "+sql);
     console.log("registro.EMPRESAS ==> "+registro.EMPRESAS);
     return this.db.executeSql(sql, [registro.ULTIMAACTUALIZACION, registro.EMPRESAS]);
-  } 
+  }
 
   //Iflores - Obtener Parametro del Sistema
   obtenerParametro(codigoParametro:string){
@@ -358,12 +539,122 @@ export class TasksServiceProvider {
     .catch(error => Promise.reject(error));
   }
 
+  /**_________________________________________________________________*/
+  //VTAMA - Query clientes NC Principal
+  obtenerClientesNotaCredito(filtros:any){
+    let sql = "SELECT distinct codcliente,datos_cliente,tipocliente,vendedor FROM "+this.TABLA_FACNOTACREDITOCAB +
+              "  where codempresa = "+filtros.empresa +
+              "  and datos_cliente || codcliente like '%"+filtros.cliente+"%'" +
+              "  LIMIT 15";
+
+    console.log("obtenerClientesNC ==> "+sql);
+
+    return this.db.executeSql(sql, [])
+      .then(response => {
+        let registros = [];
+        for (let index = 0; index < response.rows.length; index++) {
+          registros.push( response.rows.item(index) );
+        }
+        console.log("EjecutaConsultaNC: "+registros.length );
+        return Promise.resolve( registros );
+      })
+      .catch(error => Promise.reject(error));
+  }
+
+  /**_________________________________________________________________*/
+  //VTAMA 15-01-2021
+  obtenerItemDevolucion(filtros:any){
+    console.log("FILTRO ARTICULO==> "+filtros.articulo+"CLIENTE: "+filtros.cliente+" EMPRESA->"+filtros.empresa);
+    let sql = "select CAB.FECHAREGISTRO," +
+      "       cab.CODAGENCIA,"+
+      "       cab.CODTIPOCMPR,"+
+      "       DET.ARTICULO," +
+      "       det.NUMCMPRVENTA," +
+      "       det.NUMCMPRVENTADET," +
+      "       cab.NUMDOCUMENTO," +
+      "       det.PRECIO," +
+      "       det.PORCDESCUENTO," +
+      "       det.DESCUENTO," +
+      "       det.CANTIDAD," +
+      "       det.SUBTOTAL," +
+      "       det.IMPUESTO," +
+      "       det.TOTAL," +
+      "       det.CODARTICULO," +
+      "       det.CANTIDADDEVUELTA" +
+      "  from facnotacreditocab cab" +
+      " inner join facnotacreditodet det" +
+      "    on (det.NUMCMPRVENTA = cab.NUMCMPRVENTA and" +
+      "       det.CODTIPOCMPR = cab.CODTIPOCMPR)" +
+      " where det.ARTICULO like '%"+filtros.articulo+"%'" +
+      "   and cab.CODCLIENTE = "+filtros.cliente+
+      "   and cab.CODEMPRESA = "+filtros.empresa +
+      "   and cab.FECHAREGISTRO >= date('now', '-1 year')" +
+      " order by cab.FECHAREGISTRO desc";
+
+    console.log("ItemsDevolver ==> "+sql);
+
+    return this.db.executeSql(sql, [])
+      .then(response => {
+        let registros = [];
+        for (let index = 0; index < response.rows.length; index++) {
+          registros.push( response.rows.item(index) );
+        }
+        console.log("EjecutaArticulosDevolver : "+registros.length );
+        return Promise.resolve( registros );
+      })
+      .catch(error => Promise.reject(error));
+  }
+  /**_________________________________________________________________*/
+  obtenerFacturaDevolucion(filtros:any){
+    console.log("FILTRO ARTICULO==> "+filtros.articulo+"CLIENTE: "+filtros.cliente+" EMPRESA->"+filtros.empresa);
+    let sql = "select " +
+      "CAB.FECHAREGISTRO," +
+      "cab.CODAGENCIA,"+
+      "cab.CODTIPOCMPR,"+
+      "DET.ARTICULO,     " +
+      "det.NUMCMPRVENTA, " +
+      "det.NUMCMPRVENTADET, " +
+      "cab.NUMDOCUMENTO, " +
+      "det.PRECIO,       " +
+      "det.PORCDESCUENTO," +
+      "det.DESCUENTO,    " +
+      "det.CANTIDAD,     " +
+      "det.SUBTOTAL,     " +
+      "det.IMPUESTO,     " +
+      "det.TOTAL,        " +
+      "det.CODARTICULO,    " +
+      "det.CANTIDADDEVUELTA  " +
+      "from facnotacreditocab cab inner join facnotacreditodet det    on (det.NUMCMPRVENTA = cab.NUMCMPRVENTA and det.CODTIPOCMPR = cab.CODTIPOCMPR) " +
+      " where cab.NUMDOCUMENTO = '"+filtros.articulo.trim()+"' "+
+      " and cab.CODCLIENTE = "+filtros.cliente+
+      " and cab.CODEMPRESA = "+filtros.empresa +
+      " and cab.FECHAREGISTRO >= date('now', '-1 year') " +
+      " order by cab.FECHAREGISTRO desc";
+
+    console.log("FACTURA ==> "+sql);
+
+    return this.db.executeSql(sql, [])
+      .then(response => {
+        let registros = [];
+        for (let index = 0; index < response.rows.length; index++) {
+          registros.push( response.rows.item(index) );
+        }
+        console.log("EjecutaArticulosDevolver : "+registros.length );
+        return Promise.resolve( registros );
+      })
+      .catch(error => Promise.reject(error));
+  }
+
+
+  /**_________________________________________________________________*/
+
+
   //Iflores - Query Cartera Saldos x Cliente
   obtenerEstadoCuentaXCliente(filtros:any){
     let sql =  " SELECT D.*, 'N' AS BLOQUEADO FROM "+this.TABLA_COBCARTERADET+" D"
               +" WHERE D.CODEMPRESA = "+filtros.empresa
               +" AND D.CODCLIENTE = "+filtros.cliente;
-    
+
     if(filtros.soloFacturas != undefined && filtros.soloFacturas == 'S'){
       sql = sql +" AND (D.REFERENCIA LIKE '%FAC%' "
                 +"      OR D.REFERENCIA LIKE '%VTAIN%' "
@@ -431,7 +722,7 @@ export class TasksServiceProvider {
               " FROM "+this.TABLA_COBRECIBOCAB+" CB "+
               "           LEFT OUTER JOIN COBUSUARIOS U ON U.CODUSUARIO = CB.CODUSUARIO "+
               "           LEFT OUTER JOIN COBCARTERACAB CC ON  CC.CODEMPRESA = CB.CODEMPRESA AND trim(CC.CODCLIENTE) = trim(CB.CODCLIENTE) "+
-              " WHERE CB.CODEMPRESA= '"+empresa+"'"+ 
+              " WHERE CB.CODEMPRESA= '"+empresa+"'"+
               " AND CB.FECHA BETWEEN '"+fdesde+"' AND '"+fhasta+"'"+
               " AND CB.CODUSUARIO = '"+codigoUsuario+"'"+
               " ORDER BY "+
@@ -485,8 +776,8 @@ export class TasksServiceProvider {
               " AND ROWID = "+entidadCobro.ID+" ";
 
     console.log("sql ==> "+sql);
-    return this.db.executeSql(sql, []); 
-  } 
+    return this.db.executeSql(sql, []);
+  }
 
   //************* CIERRE ****************
   obtenerCierreCobranzas(empresa:string, idcierre:string){
@@ -508,7 +799,7 @@ export class TasksServiceProvider {
 
   obtenerCierresPendientes(empresa:string, idcierre:string,){
     let sql = "SELECT * FROM "+this.TABLA_COBCIERRE+" C "+
-              " WHERE CODEMPRESA = '"+empresa+"' "+ 
+              " WHERE CODEMPRESA = '"+empresa+"' "+
               "   AND IDCIERRE <> '"+idcierre+"' "+
               "   AND IFNULL(BANCO,'N') <> 'S' ";
 
@@ -533,13 +824,13 @@ export class TasksServiceProvider {
               " WHERE CODEMPRESA = '"+entidadCierre.CODEMPRESA+"' "+
               " AND IDCIERRE = '"+entidadCierre.IDCIERRE+"' ";
     console.log("sql ==> "+sql);
-    return this.db.executeSql(sql, []); 
-  } 
+    return this.db.executeSql(sql, []);
+  }
 
   //Valida que todos los cobros hayan sido Enviados a MBW
   obtenerCobrosCierre(empresa:string, idcierre:string){
     let sql = "SELECT * FROM "+this.TABLA_COBRECIBOCAB+" CB "+
-              " WHERE CB.CODEMPRESA= '"+empresa+"'"+ 
+              " WHERE CB.CODEMPRESA= '"+empresa+"'"+
               " AND CB.FECHA = '"+idcierre+"' "+
               " AND CB.CODESTADO <> 'ANULADO' ";
 
@@ -552,14 +843,14 @@ export class TasksServiceProvider {
       }
       return Promise.resolve( registros );
     })
-    .catch(error => Promise.reject(error));  
+    .catch(error => Promise.reject(error));
   }
 
   //Valida que todos los cobros hayan sido Enviados a MBW
   obtenerCobrosEstado(estado:string){
     let sql = "SELECT * FROM "+this.TABLA_COBRECIBOCAB+" CB "+
-              " WHERE CB.CODESTADO = '"+estado+"' "; 
-              
+              " WHERE CB.CODESTADO = '"+estado+"' ";
+
     console.log("obtenerCobrosEstado ==> "+sql);
     return this.db.executeSql(sql, [])
     .then(response => {
@@ -569,7 +860,7 @@ export class TasksServiceProvider {
       }
       return Promise.resolve( registros );
     })
-    .catch(error => Promise.reject(error));  
+    .catch(error => Promise.reject(error));
   }
 
 
