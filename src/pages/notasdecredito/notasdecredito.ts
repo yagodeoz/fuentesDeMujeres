@@ -71,8 +71,10 @@ export class NotasdecreditoPage {
     this.fhasta = this.beanSeguridad.fechaActual().substring(0,10);*/
 
     //********** Obtencion de las Empresas *********************
-    this.empresa = null;
-    this.listaEmpresas = JSON.parse(beanSeguridad.EMPRESAS);
+    //09032021
+    this.empresa = navParams.get('empresa');
+    this.nombre_empresa = navParams.get('nombre_empresa');
+    /*this.listaEmpresas = JSON.parse(beanSeguridad.EMPRESAS);
     for (let i = 0; i < this.listaEmpresas.length; i++) {
       this.empresas.push({value: this.listaEmpresas[i].empresa, text: this.listaEmpresas[i].nombre});
       //Asigna la primera empresa
@@ -80,7 +82,7 @@ export class NotasdecreditoPage {
         this.empresa = this.listaEmpresas[i].empresa;
         this.nombre_empresa = this.listaEmpresas[i].nombre;
       }
-    }
+    }*/
     //this.obtenerInformacion();
 
     let loading = this.loadingCtrl.create({content: 'Actualizando Información... <br><b>Por favor espere...</b>'});
@@ -153,9 +155,11 @@ export class NotasdecreditoPage {
   }
   /*---------------------------------------------------------------*/
   onSelectChange(item:any, tipo:string) {
+    console.log("onSelectChange-->"+item);
     if(tipo == "EMP"){
       this.empresa = item.value.trim();
       this.nombre_empresa = item.text.trim();
+      console.log("CAMBIAEMPRESA-->"+this.nombre_empresa);
     }
 
     //Re-leer el Grid Principal
@@ -219,8 +223,7 @@ export class NotasdecreditoPage {
             //Carga de los registros
             console.log("ClienteNCregistros: "+ JSON.stringify(data) );
             for (let i = 0; i < data.length; i++) {
-              cadenaSaldos =  " • TIPO CLIENTE : "+ data[i].TIPOCLIENTE +
-                              " • VENDEDOR     : "+ data[i].VENDEDOR;
+              cadenaSaldos =  " • TIPO CLIENTE : "+ data[i].TIPOCLIENTE; //+                              " • VENDEDOR     : "+ data[i].VENDEDOR;
 
               //Inserta el Registroa a Pantalla
 
@@ -370,7 +373,7 @@ export class NotasdecreditoPage {
   verSaldos(item){
     console.log("MODULOSELECCIONADO==> "+this.moduloSeleccionado.value+" TIPONCELECCIONADO==> "+this.tipoSeleccionado.value);
     let parametros = {empresa:this.filtro_empresa, cliente:item.title, saldos:item.note, saldos1:item.note2, nombre_empresa: this.nombre_empresa, nuevo: 'S',modulo:this.moduloSeleccionado.value, tiponc:this.tipoSeleccionado.value};
-    console.log("ParametrosEnviados==>"+JSON.stringify(parametros));
+    console.log("ParametrosEnviadosSaldosclientesPage==>"+JSON.stringify(parametros));
     this.navCtrl_Pages.push(SaldosclientesPage,parametros);
   }
 

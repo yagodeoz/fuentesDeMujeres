@@ -116,6 +116,7 @@ export class SaldonotascreditoPage {
   title: string;
 
   marcartodos : boolean;
+  obsVendedor: String ="";
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
               public alertCtrl: AlertController,
@@ -124,14 +125,26 @@ export class SaldonotascreditoPage {
               public loadingCtrl: LoadingController,
               private modal: ModalController) {
 
-    console.log("SaldosclientesPage....");
-    console.log("SaldosclientesPage ID...."+navParams.get('ID'));
+    console.log("SaldoNotaCredito....");
+    console.log("SaldoNotaCreditoPage ID...."+navParams.get('ID'));
 
-    this.filtro_empresa = navParams.get('empresa');
-    this.nombre_empresa = navParams.get('nombre_empresa');
-    this.isNuevo = navParams.get('nuevo') == 'S';
-    this.idmoduloSel = navParams.get('modulo');
-    this.idtiponcSel = navParams.get('tiponc');
+    if (navParams.get('nuevo') == 'S'){
+      this.filtro_empresa = navParams.get('empresa');
+      this.nombre_empresa = navParams.get('nombre_empresa');
+      this.isNuevo = navParams.get('nuevo') == 'S';
+      this.idmoduloSel = navParams.get('modulo');
+      this.idtiponcSel = navParams.get('tiponc');
+      this.listaDocumentosAcum.data = []
+    }else{
+
+      this.filtro_empresa = navParams.get('empresa');
+      this.nombre_empresa = navParams.get('nombre_empresa');
+      this.isNuevo = false;//navParams.get('nuevo') == 'N';
+      this.idmoduloSel = navParams.get('TIPONOTACREDITO').split("-")[1];
+      this.idtiponcSel = navParams.get('TIPONOTACREDITO').split("-")[0];
+      console.log("FILTROS-->"+this.filtro_empresa+"-"+this.nombre_empresa +"-"+this.idmoduloSel +"-"+this.idtiponcSel);
+    }
+
     if(this.isNuevo){
       this.filtro_cliente = navParams.get('cliente');
       this.codigo_cliente = this.filtro_cliente.split('-')[0].trim();
@@ -139,22 +152,64 @@ export class SaldonotascreditoPage {
       this.titulo_opcion = "Nota de Crédito / "+this.nombre_empresa;
       this.idRecibo = "0"; //No tiene ID asignado
     }else{
-      this.filtro_cliente = navParams.get('CODCLIENTE').trim()+"-"+navParams.get('NOMBRECLIENTE').trim();
-      this.codigo_cliente = navParams.get('CODCLIENTE').trim();
-      this.nombre_cliente = navParams.get('NOMBRECLIENTE').trim();
-      this.titulo_opcion = navParams.get('IDRECIBO').trim()+ " / "+this.nombre_empresa;
-      this.idRecibo = navParams.get('ID').trim(); //Tiene ID asignado (ROWID)
+      console.log("NO ES NUEVO");
+      this.filtro_cliente = navParams.get('CLIENTE');
+      this.codigo_cliente = navParams.get('CLIENTE').split('-')[0].trim();
+      this.nombre_cliente = navParams.get('CLIENTE').split('-')[1].trim();
+      this.titulo_opcion = "Nota de Credito / "+this.nombre_empresa;//navParams.get('IDNOTACREDITO').trim()+ " / "+this.nombre_empresa;
+      this.idRecibo = navParams.get('ID').trim(); //Tiene ID asignado (ROWID)*/
+      this.obsVendedor =navParams.get('OBSERVACIONES').trim();
+
+      this.items = [];
+
+      var detallesnotacre =navParams.get('DETALLESNC');
+      this.listaDocumentos.data  = JSON.parse(detallesnotacre);
+      this.listaDocumentosAcum.data = JSON.parse(detallesnotacre);
+      let datax = this.listaDocumentos.data;
+
+      for (let i = 0; i < datax.length; i++) {
+
+        //Inserta el Registro a Pantalla
+        this.items.push({id: JSON.stringify(datax[i]),
+          titulo:'ARTICULO: '+ datax[i].ARTICULO,
+          titulo1:' PRECIO FACTURADO $ '+ datax[i].PRECIO,
+          b1: 'FECHA:',
+          b2: '',
+          b3: '',
+          b4: '% DESCUENTO: ',
+          b5: 'CANTIDAD DEVUELTA: ',
+          b6: 'DEVOLVER',
+          b7: 'FACTURA # ',
+          v1: datax[i].FECHAREGISTRO,
+          v2: '(CANTIDAD FACTURADA: '+datax[i].CANTIDAD+')',
+          v3: datax[i].NUMCMPRVENTA,
+          v4: datax[i].PORCDESCUENTO,
+          v5: "" ,
+          v6: datax[i].CANTIDADDEVUELTA,
+          v7: datax[i].NUMDOCUMENTO,
+          isBloqueado: datax[i].BLOQUEADO
+        });
+
+        //console.log("DOCUMENTO APLICADO: "+JSON.stringify(data[i]));
+        //Ingreso a la lista los registros modificados
+        //this.listaDocumentos.data.push(datax[i]);
+
+      }
+
+
+
+      //--
     }
 
     //Inicializa la Informacion
     //this.inicializarComponentes();
-    this.listaDocumentosAcum.data = []
+
   }
   inicializarComponentes() {
 
     this.marcartodos = false;
     this.listaDocumentos.data = [];
-    //console.log("PARAMETRO EMPRESA: "+this.filtro_empresa+", cliente:"+this.codigo_cliente);
+    console.log("PARAMETRO EMPRESA: "+this.filtro_empresa+", cliente:"+this.codigo_cliente);
     //Iniciar con Formas de Pago Cargados
     /*this.listaDocumentos.data = [];
     let loading = this.loadingCtrl.create({ content: 'Obteniendo Información... <br><b>Por favor espere...</b>' });
@@ -194,7 +249,7 @@ export class SaldonotascreditoPage {
   //************* CAMBIO DE TAB *****************
   cambioTab(){
     //Filtro articulo - Obligatorio
-    this.isDocumentos = true
+    this.isDocumentos = true;
     if(this.filtro_articulo == null || "" == this.filtro_articulo){
       let alert = this.alertCtrl.create({
         title: 'Atención',
@@ -204,8 +259,9 @@ export class SaldonotascreditoPage {
       alert.present();
       return;
     }
-    this.inicializarComponentes();
+    //this.inicializarComponentes();09032021
     this.listaDocumentos.data = [];
+    this.marcartodos = false;
     let loading = this.loadingCtrl.create({ content: 'Obteniendo Información Items... <br><b>Por favor espere...</b>' });
     loading.present()
       .then(() =>{
@@ -215,49 +271,51 @@ export class SaldonotascreditoPage {
             console.log("CantidadEncontrados"+data.length);
             if(data.length > 0){
               this.listaDocumentos.data = data;
-            }else {              this.tasksService.obtenerFacturaDevolucion({empresa:this.filtro_empresa, cliente:this.codigo_cliente, articulo:this.filtro_articulo})
-                .then(data =>{
-                  if (data.length > 0){
-
-                    this.listaDocumentos.data = data;
-
-                  }else{
-                    let alert = this.alertCtrl.create({
-                      title: 'Atención',
-                      subTitle: 'No existen resultados para la busqueda realizada.',
-                      buttons: ["Aceptar"]
-                    });
-                    alert.present();
-                    return;
-                  }
-                })
+              this.cargarListaDocumentos();
+            }else {
+              this.tasksService.obtenerFacturaDevolucion({empresa:this.filtro_empresa, cliente:this.codigo_cliente, articulo:this.filtro_articulo})
+              .then(data =>{
+                if (data.length > 0){
+                  console.log("CantidadEncontrados"+data.length);
+                  this.listaDocumentos.data = data;
+                  this.cargarListaDocumentos();
+                }else{
+                  let alert = this.alertCtrl.create({
+                    title: 'Atención',
+                    subTitle: 'No existen resultados para la busqueda realizada.',
+                    buttons: ["Aceptar"]
+                  });
+                  alert.present();
+                  return;
+                }
+              });
             }
           });
-      })
-    this.cargarListaDocumentos();
-    this.inicializarComponentes();
-    loading.dismiss();
-      /*.then(() =>{
-        //Si no es nuevo cargo las Variables para Edicion
-        if(!this.isNuevo){
-          var cadenaCobro = this.navParams.get('DETALLESPAGO');
-          var cadenaDocumentos = this.navParams.get('DETALLESDOCU');
-          //var idRecibo = this.navParams.get('idRecibo').trim();
-          this.listaFormasPago.data = JSON.parse(cadenaCobro);
-          this.listaDocumentos.data  = JSON.parse(cadenaDocumentos);
-          //Para que aparezca aplicado los items
-          //this.cargarListaDocumentos();
-          //this.titulo_opcion = idRecibo+ " / "+this.nombre_empresa;
-          //this.SECUENCIARECIBO = idRecibo; //(+idRecibo.substring(10,idRecibo.length)*1);
-        }
-      })
-      .then(() =>{
-        //Seteo como tab inicial Las Formas de Pago
-        //this.cambioTab();
+      });
 
-        //Cierra Espera
-        loading.dismiss();
-      })*/
+    //this.inicializarComponentes();09032021
+    loading.dismiss();
+    /*.then(() =>{
+      //Si no es nuevo cargo las Variables para Edicion
+      if(!this.isNuevo){
+        var cadenaCobro = this.navParams.get('DETALLESPAGO');
+        var cadenaDocumentos = this.navParams.get('DETALLESDOCU');
+        //var idRecibo = this.navParams.get('idRecibo').trim();
+        this.listaFormasPago.data = JSON.parse(cadenaCobro);
+        this.listaDocumentos.data  = JSON.parse(cadenaDocumentos);
+        //Para que aparezca aplicado los items
+        //this.cargarListaDocumentos();
+        //this.titulo_opcion = idRecibo+ " / "+this.nombre_empresa;
+        //this.SECUENCIARECIBO = idRecibo; //(+idRecibo.substring(10,idRecibo.length)*1);
+      }
+    })
+    .then(() =>{
+      //Seteo como tab inicial Las Formas de Pago
+      //this.cambioTab();
+
+      //Cierra Espera
+      loading.dismiss();
+    })*/
   }
   //***********************************************
 
@@ -313,6 +371,7 @@ export class SaldonotascreditoPage {
 //Realiza la Busqueda de Clientes
   cargarListaDocumentos() {
     //console.log("Datos de articulos..."+JSON.stringify(this.listaDocumentos.data));
+    this.isDocumentos = true;
     if(!this.isDocumentos){
       return;
     }
@@ -335,6 +394,7 @@ export class SaldonotascreditoPage {
         var valorAplicaDocumento = 0;
 
         this.listaDocumentos.data = [];
+        console.log("MUESTRA-->"+data);
         for (let i = 0; i < data.length; i++) {
 
           //Aplicacion de las Fomas de Pago
@@ -345,10 +405,10 @@ export class SaldonotascreditoPage {
               valorAplicaDocumento = +parseInt(data[i].CANTIDADDEVUELTA);
               valorTotalAplicado = valorTotalAplicado + valorAplicaDocumento;
             }else{
-                data[i].VALORXAPLICAR = "0";
-                data[i].BLOQUEADO = "N";
-              }
+              data[i].VALORXAPLICAR = "0";
+              data[i].BLOQUEADO = "N";
             }
+          }
           //}
 
           //Inserta el Registroa a Pantalla
@@ -390,43 +450,7 @@ export class SaldonotascreditoPage {
     this.cargarListaDocumentos();
   }
 
-//******** LLAMA A PANTALLA PARA NUEVA FORMA DE PAGO ********
-  /*abrirNuevaFormaPago(cadenaFP:any) {
-    console.log("abrirNuevaFormaPago..."+JSON.stringify(cadenaFP));
-    let myModalData = (cadenaFP != null) ? cadenaFP : this.myModalDataFP;
-    const myModalOptions: ModalOptions = { enableBackdropDismiss: false };
-    const myModal: Modal = this.modal.create('FormaspagoPage', {data: myModalData, empresa:this.filtro_empresa}, myModalOptions);
-    myModal.present();
 
-    //Ingreso/Actualizacion de las FPago
-    myModal.onDidDismiss((data) => {
-      if(data != null){
-        console.log("Lista Recibido ==> "+JSON.stringify(data));
-        if((+data.iddetalle) != 0){
-          let listaFP = this.listaFormasPago.data;
-          this.listaFormasPago.data = [];
-          for (let i = 0; i < listaFP.length; i++) {
-            if(data.iddetalle == listaFP[i].iddetalle){
-              this.listaFormasPago.data.push(data);
-            }else{
-              this.listaFormasPago.data.push(listaFP[i]);
-            }
-          }
-        }
-        else{
-          data.iddetalle = ""+(this.listaFormasPago.data.length+1);
-          this.listaFormasPago.data.push(data);
-        }
-        this.cargarListaFormasPago();
-      }
-    });
-
-    myModal.onWillDismiss((data) => {
-      console.log("I'm about to dismiss");
-      console.log(JSON.stringify(data));
-      //
-    });
-  }*/
 
   /**** PROCESO ELIMINA FPAGO PANTALLA */
   eliminarFormaPago(cadenaFP:any) {
@@ -473,8 +497,19 @@ export class SaldonotascreditoPage {
   }*/
 
 //Guardar el Cobro
-  guardarCobro(){
+  guardarnc(){
     console.log("ingreso a GUARDAR");
+    console.log("listaAcumuladaINICIAL==>"+JSON.stringify(this.listaDocumentosAcum.data));
+    var obstamanio = this.obsVendedor.length;
+    if(  obstamanio <= 0 ) {
+      let alert = this.alertCtrl.create({
+        title: 'Atención',
+        subTitle: 'Error ==> Es obligatorio el registro del campo Observaciones.',
+        buttons: ["Aceptar"]
+      });
+      alert.present();
+      return;
+    }
     //Validaciones
     //let totalFormasPago  = //+parseFloat(this.TOTAL_FPAGOS.replace(",","")).toFixed(2) * 1;
     /*let totalDocumentos  = +parseFloat(this.TOTAL_APLICAR.replace(",","")).toFixed(2) * 1;
@@ -501,11 +536,10 @@ export class SaldonotascreditoPage {
     let loading = this.loadingCtrl.create({ content: 'Validando Información... <br><b>Por favor espere...</b>' });
     loading.present();
 
-    //Validacion de guardado TOTAL APLICADO <= TOTAL FP
-    //var valorTotalFormasPago = (+this.TOTAL_FPAGOS) * 1;
+
     var valorTotalAplicado = 0;
     var listaAplicados = [];
-    let detallesDocumentos = this.listaDocumentosAcum.data; //this.listaDocumentosAcum.data
+    let detallesDocumentos = this.listaDocumentosAcum.data;
     console.log("listaDocumentos"+JSON.stringify(detallesDocumentos));
     for (let i = 0; i < detallesDocumentos.length; i++) {
       //Si tiene un valor aplicado se considera
@@ -532,33 +566,36 @@ export class SaldonotascreditoPage {
 
 
             var registroNotaCredito = {
-              CODEMPRESA: this.filtro_empresa,
-              TIPONOTACREDITO:this.idtiponcSel,
-              FECHA: this.beanSeguridad.fechaActual().substring(0, 10),
-              CODUSUARIO: this.beanSeguridad.USUARIO_LOGONEADO,
-              CLIENTE: this.codigo_cliente,
-              DETALLESNC: JSON.stringify(listaAplicados),
-              CODESTADO: 'ACTIVO',
-              FECRESP_MWB: null
-            };
+                ID: (this.isNuevo?"-":this.idRecibo),
+                CODEMPRESA: this.filtro_empresa,
+                TIPONOTACREDITO:this.idtiponcSel+"-"+this.idmoduloSel,
+                IDNOTACREDITO: null,
+                FECHA: this.beanSeguridad.fechaActual().substring(0, 10),
+                CODUSUARIO: this.beanSeguridad.USUARIO_LOGONEADO,
+                CLIENTE: this.codigo_cliente+"-"+this.nombre_cliente,
+                DETALLESNC: JSON.stringify(listaAplicados),
+                CODESTADO: 'ACTIVO',
+                OBSERVACIONES: this.obsVendedor,
+                FECRESP_MWB: null
+              };
 
             //Ejecuto Guardado de los cambios
             //console.log("NUEVO-->"+this.isNuevo);
             if(!this.isNuevo){
               // *** Actualizar Registro ************
-              /*this.tasksService.actualizarCobros(registroNotaCredito)
-                .then(response => {*/
+              this.tasksService.actualizarNotaCredito(registroNotaCredito)
+                .then(response => {
                   console.log("guardado ACTUALIZAR Exitoso");
                   let alert = this.alertCtrl.create({
                     title: 'Atención',
-                    subTitle: 'Nota de Credito Modificado Exitosamente.', //'+this.SECUENCIARECIBO+'
+                    subTitle: 'Solicitud de Nota de Credito Modificado Exitosamente.',
                     buttons: ["Aceptar"]
                   });
                   alert.present();
-                //})
-                /*.catch( error => {
+                })
+                .catch( error => {
                   console.error( error );
-                });*/
+                });
               //*************************************
 
               //Retorno Pagina Anterior
@@ -572,7 +609,7 @@ export class SaldonotascreditoPage {
                   console.log("guardado INGRESO Exitoso");
                   let alert = this.alertCtrl.create({
                     title: 'Atención',
-                    subTitle: 'Nota de credito Guardado Exitosamente.', //'+this.SECUENCIARECIBO+'
+                    subTitle: 'Solicitud de Nota de credito Guardado Exitosamente.', //'+this.SECUENCIARECIBO+'
                     buttons: ["Aceptar"]
                   });
                   alert.present();
@@ -581,7 +618,7 @@ export class SaldonotascreditoPage {
                   console.error( error );
                 });
               //*************************************
-                this.enviarNotaCreditoMBW(this.filtro_empresa,this.idtiponcSel,this.beanSeguridad.fechaActual().substring(0, 10),this.beanSeguridad.USUARIO_LOGONEADO,this.codigo_cliente,listaAplicados);
+              //this.enviarNotaCreditoMBW(this.filtro_empresa,this.idtiponcSel,this.beanSeguridad.fechaActual().substring(0, 10),this.beanSeguridad.USUARIO_LOGONEADO,this.codigo_cliente,listaAplicados);
               //Retorno a Pantalla Principal de Cobranzas
               this.listaDocumentosAcum.data = [];
               this.navCtrl.pop();
@@ -625,7 +662,7 @@ export class SaldonotascreditoPage {
     confirm.present();
   }
 
-  /** EDITA EL VALOR DE ABONO */
+  /** EDITA EL VALOR DE DEVOLUCION */
   editarDevolucion(item:any){
     console.log("Editar Devolucion==> "+item.id);
     var cadenaDocumento = JSON.parse(item.id);
@@ -633,19 +670,19 @@ export class SaldonotascreditoPage {
     var FECHAREGISTRO = cadenaDocumento.FECHAREGISTRO;
 
     //for (let i = 0; i < cadenaDocumento.length; i++) {
-      var ARTICULO = cadenaDocumento.ARTICULO.split('-')[0];
-      var CODARTICULO = cadenaDocumento.CODARTICULO;
-      var NUMCMPRVENTA = cadenaDocumento.NUMCMPRVENTA;
-      var NUMDOCUMENTO = cadenaDocumento.NUMDOCUMENTO;
-      var PRECIO = cadenaDocumento.PRECIO;
-      var PORCDESCUENTO = cadenaDocumento.PORCDESCUENTO;
-      var DESCUENTO = cadenaDocumento.DESCUENTO;
-      var CANTIDAD = cadenaDocumento.CANTIDAD;
-      var SUBTOTAL = cadenaDocumento.SUBTOTAL;
-      var IMPUESTO = cadenaDocumento.IMPUESTO;
-      var TOTAL = cadenaDocumento.TOTAL;
-      var CANTIDADDEVUELTA = cadenaDocumento.CANTIDADDEVUELTA;
-      var NUMCMPRVENTADET = cadenaDocumento.NUMCMPRVENTADET;
+    var ARTICULO = cadenaDocumento.ARTICULO.split('-')[0];
+    var CODARTICULO = cadenaDocumento.CODARTICULO;
+    var NUMCMPRVENTA = cadenaDocumento.NUMCMPRVENTA;
+    var NUMDOCUMENTO = cadenaDocumento.NUMDOCUMENTO;
+    var PRECIO = cadenaDocumento.PRECIO;
+    var PORCDESCUENTO = cadenaDocumento.PORCDESCUENTO;
+    var DESCUENTO = cadenaDocumento.DESCUENTO;
+    var CANTIDAD = cadenaDocumento.CANTIDAD;
+    var SUBTOTAL = cadenaDocumento.SUBTOTAL;
+    var IMPUESTO = cadenaDocumento.IMPUESTO;
+    var TOTAL = cadenaDocumento.TOTAL;
+    var CANTIDADDEVUELTA = cadenaDocumento.CANTIDADDEVUELTA;
+    var NUMCMPRVENTADET = cadenaDocumento.NUMCMPRVENTADET;
     //}
 
     //console.log("DEVOLUCIONDATOS: -> "+cadenaDocumento)
@@ -859,10 +896,10 @@ export class SaldonotascreditoPage {
       }
 
 
-  }
+    }
     this.cargarListaDocumentos();
 
-}
+  }
   ionViewWillLoad(){
     //this.inicializarComponentes();
     console.log('ionViewDidLoad SaldonotascreditoPage');

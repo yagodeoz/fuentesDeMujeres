@@ -1,6 +1,7 @@
 //import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { SQLiteObject } from '@ionic-native/sqlite';
+import * as moment from "moment";
 
 /*
   Generated class for the TasksServiceProvider provider.
@@ -40,7 +41,8 @@ export class TasksServiceProvider {
                           +'NOMBRE TEXT, '
                           +'CLAVE TEXT, '
                           +'CLIENTESTODOS TEXT, '
-                          +'ULTIMAACTUALIZACION TEXT)';
+                          +'ULTIMAACTUALIZACION TEXT,'
+                          +'FECHAACTNC TEXT)';
 
  public SQL_COBCARTERACAB = 'CREATE TABLE IF NOT EXISTS '+this.TABLA_COBCARTERACAB+'('
                           +'CODEMPRESA TEXT, '
@@ -145,12 +147,15 @@ export class TasksServiceProvider {
   public SQL_SOLICITUDESNC = 'CREATE TABLE IF NOT EXISTS '+this.TABLA_SOLICITUDESNC+'('
                               +'CODEMPRESA TEXT,'
                               +'TIPONOTACREDITO TEXT, '
+                              +'IDNOTACREDITO TEXT, '
                               +'FECHA TEXT,'
                               +'CODUSUARIO TEXT,'
                               +'CLIENTE TEXT,'
                               +'DETALLESNC TEXT,'
                               +'CODESTADO TEXT,'
+                              +'OBSERVACIONES TEXT,'
                               +'FECRESP_MWB TEXT )';
+  //public esPrivez: boolean =false;//15032021
 
 
   constructor() {}
@@ -172,12 +177,12 @@ export class TasksServiceProvider {
     this.crearTabla(this.TABLA_COBRECIBOCAB);
     this.crearTabla(this.TABLA_COBCIERRE);
     //VTAMA
-    this.crearTabla(this.TABLA_NC_MODULOSNC);
-    this.crearTabla(this.TABLA_NC_TIPOSNC);
+    //this.crearTabla(this.TABLA_NC_MODULOSNC);
+    //this.crearTabla(this.TABLA_NC_TIPOSNC);
     this.crearTabla(this.TABLA_FACNOTACREDITOCAB);
     this.crearTabla(this.TABLA_FACNOTACREDITODET);
     this.crearTabla(this.TABLA_SOLICITUDESNC);
-
+    //this.esPrivez = true;//15032021
     //Retorno al final de las ejecuciones
     return true;
 
@@ -229,15 +234,16 @@ export class TasksServiceProvider {
     //Tabla COBUSUARIOS
     if(this.TABLA_COBUSUARIOS == tabla){
       sql = sql.replace('[TABLA]',this.TABLA_COBUSUARIOS);
-      sql = sql.replace('[CAMPOS]',"CODUSUARIO, NOMBRE, CLAVE, CLIENTESTODOS, ULTIMAACTUALIZACION");
-      sql = sql.replace('[VALORES]',"?,?,?,?,?");
+      sql = sql.replace('[CAMPOS]',"CODUSUARIO, NOMBRE, CLAVE, CLIENTESTODOS, ULTIMAACTUALIZACION,FECHAACTNC");
+      sql = sql.replace('[VALORES]',"?,?,?,?,?,?");
 
       console.log("sql ==> "+sql);
       valores = [registro.CODUSUARIO,
                  registro.NOMBRE,
                  registro.CLAVE,
                  registro.CLIENTESTODOS,
-                 registro.ULTIMAACTUALIZACION];
+                 registro.ULTIMAACTUALIZACION,
+                 registro.FECHAACTNC];
     }
 
     //Tabla COBCARTERA CABECERA
@@ -386,15 +392,17 @@ export class TasksServiceProvider {
     }
     if(this.TABLA_SOLICITUDESNC == tabla){
       sql = sql.replace('[TABLA]',this.TABLA_SOLICITUDESNC);
-      sql = sql.replace('[CAMPOS]',"CODEMPRESA,TIPONOTACREDITO,FECHA,CODUSUARIO,CLIENTE,DETALLESNC,CODESTADO,FECRESP_MWB");
-      sql = sql.replace('[VALORES]',"?,?,?,?,?,?,?,?");
+      sql = sql.replace('[CAMPOS]',"CODEMPRESA,TIPONOTACREDITO,IDNOTACREDITO,FECHA,CODUSUARIO,CLIENTE,DETALLESNC,CODESTADO,OBSERVACIONES,FECRESP_MWB");
+      sql = sql.replace('[VALORES]',"?,?,?,?,?,?,?,?,?,?");
       valores = [registro.CODEMPRESA,
         registro.TIPONOTACREDITO,
+        registro.IDNOTACREDITO,
         registro.FECHA,
         registro.CODUSUARIO,
         registro.CLIENTE,
         registro.DETALLESNC,
         registro.CODESTADO,
+        registro.OBSERVACIONES,
         registro.FECRESP_MWB];
     }
 
@@ -542,7 +550,7 @@ export class TasksServiceProvider {
   /**_________________________________________________________________*/
   //VTAMA - Query clientes NC Principal
   obtenerClientesNotaCredito(filtros:any){
-    let sql = "SELECT distinct codcliente,datos_cliente,tipocliente,vendedor FROM "+this.TABLA_FACNOTACREDITOCAB +
+    let sql = "SELECT distinct codcliente,datos_cliente,tipocliente FROM "+this.TABLA_FACNOTACREDITOCAB +
               "  where codempresa = "+filtros.empresa +
               "  and datos_cliente || codcliente like '%"+filtros.cliente+"%'" +
               "  LIMIT 15";
@@ -589,7 +597,8 @@ export class TasksServiceProvider {
       "   and cab.CODCLIENTE = "+filtros.cliente+
       "   and cab.CODEMPRESA = "+filtros.empresa +
       "   and cab.FECHAREGISTRO >= date('now', '-1 year')" +
-      " order by cab.FECHAREGISTRO desc";
+      " order by cab.FECHAREGISTRO desc "+
+      " LIMIT 50 ";
 
     console.log("ItemsDevolver ==> "+sql);
 
@@ -599,7 +608,8 @@ export class TasksServiceProvider {
         for (let index = 0; index < response.rows.length; index++) {
           registros.push( response.rows.item(index) );
         }
-        console.log("EjecutaArticulosDevolver : "+registros.length );
+        console.log("EjecutaItemDevolver : "+registros.length );
+        //alert("obtenerItemDevolucion-->"+registros.length );
         return Promise.resolve( registros );
       })
       .catch(error => Promise.reject(error));
@@ -629,7 +639,8 @@ export class TasksServiceProvider {
       " and cab.CODCLIENTE = "+filtros.cliente+
       " and cab.CODEMPRESA = "+filtros.empresa +
       " and cab.FECHAREGISTRO >= date('now', '-1 year') " +
-      " order by cab.FECHAREGISTRO desc";
+      " order by cab.FECHAREGISTRO desc " +
+      " LIMIT 150 ";
 
     console.log("FACTURA ==> "+sql);
 
@@ -639,7 +650,8 @@ export class TasksServiceProvider {
         for (let index = 0; index < response.rows.length; index++) {
           registros.push( response.rows.item(index) );
         }
-        console.log("EjecutaArticulosDevolver : "+registros.length );
+        console.log("EjecutaFacturaDevolver : "+registros.length );
+        //alert("obtenerFacturaDevolucion-->"+registros.length );
         return Promise.resolve( registros );
       })
       .catch(error => Promise.reject(error));
@@ -749,8 +761,15 @@ export class TasksServiceProvider {
     return this.db.executeSql(sql, []);
   }
 
+  //Eliminar registros de Nota de credito
+  eliminarRegNotaCredito(empresa:string, rowidnotacredito:string){
+    let sql = "DELETE FROM "+this.TABLA_SOLICITUDESNC+" WHERE CODEMPRESA = '"+empresa+"' AND ROWID = "+rowidnotacredito+" ";
+    console.log("sql ==> "+sql);
+    return this.db.executeSql(sql, []);
+  }
+
   //Cambiar Estado Cobros
-  cambiarEstadoCobros(empresa:string, idrecibo:string, estado:string, secuenciaRecibo:string){
+   cambiarEstadoCobros(empresa:string, idrecibo:string, estado:string, secuenciaRecibo:string){
 
     let sql = "UPDATE "+this.TABLA_COBRECIBOCAB+" SET CODESTADO = '"+estado+"' ";
 
@@ -766,6 +785,24 @@ export class TasksServiceProvider {
     return this.db.executeSql(sql, []);
   }
 
+  /*------------------------------------------------------------------------------------------------*/
+  //Cambiar Estado Cobros
+  cambiarEstadoNC(empresa:string, rowidnotacredito:string, estado:string, numcmprventa:string){
+    console.log("EnvioNC 4");
+    let sql = "UPDATE "+this.TABLA_SOLICITUDESNC+" SET CODESTADO = '"+estado+"' ";
+
+    //Si se cambia el estado a Confirmado se actualiza el IDRECIBO
+    if('ENVIADO' == estado && numcmprventa != null){
+      sql = sql +", IDNOTACREDITO = '"+numcmprventa+"' ";
+    }
+    //************************************************************
+
+    sql = sql +" WHERE CODEMPRESA = '"+empresa+ "' AND ROWID = "+rowidnotacredito+" ";
+
+    console.log("sql ACTUALIZA==> "+sql);
+    return this.db.executeSql(sql, []);
+  }
+  /*------------------------------------------------------------------------------------------------*/
   //Realiza la actualizacion de los cobros
   actualizarCobros(entidadCobro:any){
     let sql = "UPDATE "+this.TABLA_COBRECIBOCAB+
@@ -774,6 +811,19 @@ export class TasksServiceProvider {
               "     DETALLESDOCU = '"+entidadCobro.DETALLESDOCU+"' "+
               " WHERE CODEMPRESA = '"+entidadCobro.CODEMPRESA+"' "+
               " AND ROWID = "+entidadCobro.ID+" ";
+
+    console.log("sql ==> "+sql);
+    return this.db.executeSql(sql, []);
+  }
+
+  /*------------------------------------------------------------------------------------------------*/
+  //Realiza la actualizacion de registro de nota de credito
+  //VTAMA
+  actualizarNotaCredito(entidadNotacre:any){
+    let sql = "UPDATE "+this.TABLA_SOLICITUDESNC+
+      " SET DETALLESNC = '"+entidadNotacre.DETALLESNC+"' "+
+      " WHERE CODEMPRESA = '"+entidadNotacre.CODEMPRESA+"' "+
+      " AND ROWID = "+entidadNotacre.ID+" ";
 
     console.log("sql ==> "+sql);
     return this.db.executeSql(sql, []);
@@ -863,5 +913,73 @@ export class TasksServiceProvider {
     .catch(error => Promise.reject(error));
   }
 
+  //Nuevos metodos para cargar informacion de notas de credito
+  //Obtener Recibos Cobros
+  obtenerSolicitudNotaCredito(empresa:string, fdesde:string, fhasta:string, codigoUsuario:string){
+
+    let sql = " SELECT CAST(NC.ROWID AS TEXT) AS ID," +
+      "         NC.CODEMPRESA," +
+      "         NC.TIPONOTACREDITO," +
+      "         NC.IDNOTACREDITO," +
+      "         NC.FECHA," +
+      "         NC.CODUSUARIO," +
+      "         NC.CLIENTE,       " +
+      "         NC.DETALLESNC,         " +
+      "         NC.CODESTADO," +
+      "         NC.OBSERVACIONES," +
+      "         IFNULL(U.NOMBRE,NC.CODUSUARIO) AS NOMBREUSUARIO	 "+
+      " FROM "+this.TABLA_SOLICITUDESNC+" NC "+
+      "           LEFT OUTER JOIN COBUSUARIOS U ON U.CODUSUARIO = NC.CODUSUARIO "+
+      " WHERE NC.CODEMPRESA= '"+empresa+"'"+
+      " AND NC.FECHA BETWEEN '"+fdesde+"' AND '"+fhasta+"'"+
+      " AND NC.CODUSUARIO = '"+codigoUsuario+"'"+
+      " ORDER BY NC.ROWID DESC ";
+
+    console.log("sql SOLICITUDES NOTA DE CREDITO ==> "+sql);
+    return this.db.executeSql(sql, [])
+      .then(response => {
+        let tasks = [];
+        for (let index = 0; index < response.rows.length; index++) {
+          tasks.push( response.rows.item(index) );
+        }
+        return Promise.resolve( tasks );
+      })
+      .catch(error => Promise.reject(error));
+  }
+
+  //verifica que existan datos en tablas de nota de credito
+  existenRegistros(tabla:string){
+    let sql = "SELECT COUNT(*) as VALOR FROM "+ tabla ;
+    console.log("existenRegistros ==> "+sql);
+    return this.db.executeSql(sql, [])
+      .then(response => {
+        let registros = [];
+        for (let index = 0; index < response.rows.length; index++) {
+          registros.push( response.rows.item(index) );
+        }
+        return Promise.resolve( registros );
+      })
+      .catch(error => Promise.reject(error));
+  }
+  //actualiza fecha 160302021
+  updateFechaNC(registro: any){
+    let sql = "UPDATE "+this.TABLA_COBUSUARIOS+" SET FECHAACTNC = ? WHERE CODUSUARIO = '"+registro.CODUSUARIO+"'";
+    console.log("sql ==> "+sql);
+    return this.db.executeSql(sql, [registro.ULTIMAACTUALIZACION]);
+  }
+
+  obtenerFechaSincroNC(usuario:string){
+    let sql = "SELECT FECHAACTNC as fechaSincro from COBUSUARIOS WHERE CODUSUARIO = '"+ usuario+"'" ;
+    console.log("FECHASINCRO_NC ==> "+sql);
+    return this.db.executeSql(sql, [])
+      .then(response => {
+        let registros = [];
+        for (let index = 0; index < response.rows.length; index++) {
+          registros.push( response.rows.item(index) );
+        }
+        return Promise.resolve( registros );
+      })
+      .catch(error => Promise.reject(error));
+  }
 
 }

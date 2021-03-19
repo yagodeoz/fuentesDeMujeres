@@ -11,6 +11,7 @@ import { TasksServiceProvider } from '../providers/tasks-service/tasks-service';
 import { RepcomisionesPage } from '../pages/repcomisiones/repcomisiones';
 import { BeanSeguridad } from '../providers/seguridad/seguridadApp';
 import { NotasdecreditoPage} from '../pages/notasdecredito/notasdecredito';
+import { PrincipalnotasdecreditoPage} from "../pages/principalnotasdecredito/principalnotasdecredito";
 
 @Component({
   templateUrl: 'app.html',
@@ -43,7 +44,8 @@ export class MyApp {
       { title: 'Cobranzas', component: PrincipalcobranzaPage, icon:"calculator", id:"2" },
       { title: 'Rep. Cumplimiento', component: RepcomisionesPage, icon:"podium", id:"3" },
       { title: 'Actualizar Inform.', component: null, icon:"refresh", id:"4" },
-      { title: 'Generar nota credito',component:NotasdecreditoPage,icon:"archive",id:"5"}
+      //{ title: 'Generar nota credito',component:NotasdecreditoPage,icon:"archive",id:"5"}
+      { title: 'Generar nota credito',component: PrincipalnotasdecreditoPage,icon:"archive",id:"5"}
       //{ title: 'Salir', component: ListPage, icon:"log-out", id:"10" }
     ];
   }

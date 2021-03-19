@@ -1,0 +1,63 @@
+<!--
+  Generated template for the PrincipalnotasdecreditoPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+  <ion-navbar>
+    <ion-title>Solicitud de Notas de Credito</ion-title>
+  </ion-navbar>
+
+  <!-- BLOQUE FIJO -->
+  <ion-item>
+    <ion-label color="primary">Empresa:</ion-label>
+    <ion-select #item [(ngModel)]="empresa" (ionChange)="onSelectChange(item,'EMP')" >
+      <ion-option *ngFor="let empresa of empresas" value="{{empresa.value}}" >{{empresa.text}}</ion-option>
+    </ion-select>
+  </ion-item>
+  <ion-item>
+    <ion-label color="primary">F. Desde:</ion-label>
+    <ion-datetime [initialValue]="_myDate"  displayFormat="YYYY-MM-DD"  min="2018" max="2025" [(ngModel)]="fdesde" (ionChange)="onSelectChange(item,'FD')">{{datetimeValue| date: "yyyy-MM-dd"}}</ion-datetime> <!-- | date: "yyyy-MM-dd H:mm:ss" -->
+  </ion-item>
+  <ion-item>
+    <ion-label color="primary">F. Hasta:</ion-label>
+    <ion-datetime [initialValue]="_myDate"  displayFormat="YYYY-MM-DD" min="2018" max="2025" [(ngModel)]="fhasta" (ionChange)="onSelectChange(item,'FH')">{{datetimeValue| date: "yyyy-MM-dd"}}</ion-datetime>
+  </ion-item>
+  <button ion-button>
+    <ion-icon name="search" (click)="obtenerInformacionNC()" > Buscar</ion-icon>
+  </button>
+  <button ion-button>
+    <ion-icon name="add" (click)="nuevaNotaCredito()"> Nueva nota credito</ion-icon>
+  </button>
+  <ion-searchbar (ionInput)="getItems($event)" placeholder="Buscar por Cliente/Ticket..." clearInput></ion-searchbar>
+  <!-- BLOQUE FIJO -->
+</ion-header>
+
+
+<ion-content >
+  <!-- BLOQUE LISTADO -->
+  <ion-list>
+    <ion-item-sliding *ngFor="let item of items" >
+      <ion-item>
+        <h2>{{item.title}}</h2>
+        <h4>{{item.note}}<strong>{{item.estado}}</strong></h4>
+        <!--button ion-button outline  *ngIf="item.cierre == true" (click)="verReporteCierre(item)" item-end>REPORTE</button>
+        <button ion-button outline *ngIf="item.cierre == true && item.isCerrado == false"  (click)="cierreDiaCobranza(item)" item-end>CIERRE</button-->
+        <button ion-button *ngIf="item.cierre == false" item-end><ion-icon name="arrow-dropleft"></ion-icon></button>
+      </ion-item>
+      <ion-item-options side="right">
+        <!-- BLOQUE 1 -->
+        <button ion-button color="secondary" *ngIf="item.isEnviar == true"   (click)="enviarNC(item, null)">ENVIAR<ion-icon name="send"></ion-icon></button>
+        <!--button ion-button color="light"     *ngIf="item.isReversar == true" (click)="reversarNC(item)">REVERSAR<ion-icon name="undo"></ion-icon></button-->
+        <button ion-button color="blue"      *ngIf="item.isImprimir == true" (click)="imprimirNC(item,'S')">IMPRIMIR<ion-icon name="print"></ion-icon></button>
+        <!-- BLOQUE 2 -->
+        <button ion-button color="light"     *ngIf="item.isVerTicket == true" (click)="imprimirNC(item,'S')">IMPRIMIR<ion-icon name="paper"></ion-icon></button>
+        <button ion-button color="secondary" *ngIf="item.isEditar == true"    (click)="editarNC(item)">EDITAR<ion-icon name="cash"></ion-icon></button>
+        <button ion-button color="blue"      *ngIf="item.isConfirmar == true" (click)="confirmarNC(item)">CONFIRMAR<ion-icon name="logo-buffer"></ion-icon></button>
+        <button ion-button color="danger"    *ngIf="item.isEliminar == true"  (click)="eliminarNC(item)">ELIMINAR<ion-icon name="trash"></ion-icon></button>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+
+</ion-content>

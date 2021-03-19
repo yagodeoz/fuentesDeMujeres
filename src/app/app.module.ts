@@ -12,6 +12,7 @@ import { SaldosclientesPage } from '../pages/saldosclientes/saldosclientes';
 import { CobroclientePage } from '../pages/cobrocliente/cobrocliente';
 import { NotasdecreditoPage} from "../pages/notasdecredito/notasdecredito";
 import { SaldonotascreditoPage} from "../pages/saldonotascredito/saldonotascredito";
+import { PrincipalnotasdecreditoPage} from "../pages/principalnotasdecredito/principalnotasdecredito";
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -39,7 +40,8 @@ import { AppUpdate } from '@ionic-native/app-update';
     CobroclientePage,
     RepcomisionesPage,
     NotasdecreditoPage,
-    SaldonotascreditoPage
+    SaldonotascreditoPage,
+    PrincipalnotasdecreditoPage
   ],
   imports: [
     BrowserModule,
@@ -58,7 +60,8 @@ import { AppUpdate } from '@ionic-native/app-update';
     CobroclientePage,
     RepcomisionesPage,
     NotasdecreditoPage,
-    SaldonotascreditoPage
+    SaldonotascreditoPage,
+    PrincipalnotasdecreditoPage
   ],
   providers: [
     StatusBar,

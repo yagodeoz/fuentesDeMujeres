@@ -20,21 +20,13 @@
 
   <ion-grid>
     <ion-row>
-      <!--ion-col style="text-align: center" col-6 no-padding>
-        <button ion-button full icon-start [color]=" isFormasPago ? 'secondary' : 'light' " (click)="cambioTab('FPAGO')" no-margin><ion-icon name="done-all"> FORMAS PAGO</ion-icon></button>
-        <h1 style="font-weight: bold; font-size: 16px; padding:0;">
-          <button ion-button icon-start *ngIf=" isFormasPago " (click)="abrirNuevaFormaPago()" no-margin><ion-icon name="add"></ion-icon>AGREGAR</button>
-          TOTAL PAGO: {{ TOTAL_FPAGOS | currency:'USD':true:'1.2-2'}} </h1>
-      </ion-col-->
       <ion-col style="text-align: center" col-6 no-padding>
         <ion-item>
           <ion-label color="primary">BUSQUEDA:</ion-label>
-          <ion-input [(ngModel)]="filtro_articulo" placeholder="Ingrese codigo/descripcion de articulo o numero de factura individual..." clearInput></ion-input>
+          <ion-input [(ngModel)]="filtro_articulo" placeholder="codigo/descripcion articulo o # de factura individual..." clearInput></ion-input>
         </ion-item>
         <button ion-button full icon-start [color]=" isDocumentos ? 'secondary' : 'light' " (click)="cambioTab()" no-margin><ion-icon name="logo-buffer">FACTURAS</ion-icon></button>
-        <!--h1 style="font-weight: bold; font-size: 16px; padding:0;">
-          <button ion-button icon-start *ngIf=" isDocumentos " (click)="aplicarPagoDocumentos()" no-margin><ion-icon name="sync"></ion-icon>APLICAR</button>
-          TOTAL APLICADO: {{TOTAL_APLICAR  | currency:'USD':true:'1.2-2'}} </h1-->
+
       </ion-col>
       <ion-col>
         <ion-item>
@@ -45,7 +37,7 @@
       </ion-col>
       <ion-col>
         <ion-item>
-          <ion-textarea placeholder="Ingresar Observaciones..."></ion-textarea>
+          <ion-textarea placeholder="Ingresar Observaciones..."[(ngModel)]="obsVendedor" name="note"></ion-textarea>
         </ion-item>
       </ion-col>
 
@@ -56,7 +48,7 @@
     <button ion-fab>Menú</button>
     <ion-fab-list side="left">
       <button ion-button icon-start color="danger" (click)="salirCobro()"><ion-icon name="close"></ion-icon>SALIR</button>
-      <button ion-button icon-start (click)="guardarCobro()"><ion-icon name="filing"></ion-icon>GUARDAR</button>
+      <button ion-button icon-start (click)="guardarnc()"><ion-icon name="filing"></ion-icon>GUARDAR</button>
     </ion-fab-list>
   </ion-fab>
 
