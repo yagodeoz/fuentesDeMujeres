@@ -28,9 +28,13 @@ export class LoginPage {
   tasks: any[] = [];
   respuestaLogin: any = null;
   registro: any = {};
+
+  registrodos: any = {};
   //18032021
   registronc: any = null;
   sincronc: any = null;
+  tasksdos: any[] = [];
+  public tmpfechasincro: string = "";
 
   constructor(
     public navCtrl: NavController,
@@ -59,6 +63,7 @@ export class LoginPage {
     beanSeguridad.USUARIO_LOGONEADO = "-";
     beanSeguridad.EN_LINEA = false;
     beanSeguridad.SINCRONIZADO = false;
+    beanSeguridad.banPrivez = false;
 
   }
 
@@ -108,11 +113,9 @@ export class LoginPage {
             .then(fechasincro => {
               this.sincronc = fechasincro[0];
               var fechaultsincronc = "" + this.sincronc.fechaSincro;
-              console.log("FECHARETORNA2-->" + fechaultsincronc);
+              console.log("FECHARETORNAloginUser-->" + fechaultsincronc);
               this.beanSeguridad.FECHASINCRONIZADONC = fechaultsincronc;
               ///
-
-
               console.log("PARAMETRO DE BUSQEUDA FECHA TABLET " + this.beanSeguridad.FECHASINCRONIZADONC);
 
               this.tasksService.existenRegistros("FACNOTACREDITOCAB")
@@ -120,9 +123,11 @@ export class LoginPage {
                   this.registronc = existe[0];
 
                   var cadenaJSON = "" + this.registronc.VALOR;
-                  console.log("valorFACNOTACREDITOCAB ==> " + cadenaJSON);
-                  if (Number(cadenaJSON) > 0) {
+                  console.log("CANTIDADREGCABNC ==> " + cadenaJSON);
+                  if (cadenaJSON.length > 0) {
+
                     this.beanSeguridad.banPrivez = true;
+                    console.log("ASIGNAbanPrivez ==>" + this.beanSeguridad.banPrivez);
                   }
 
 
@@ -133,7 +138,9 @@ export class LoginPage {
 
         } else {
           isAccesoCorrecto = false;
-          this.validarUsuarioOnLine().then();
+
+          this.validarUsuarioOnLine();
+
         }
 
         //Mensaje Wait.......
@@ -163,23 +170,158 @@ export class LoginPage {
 
   }
 
-  validarUsuarioOnLine() {
+  /*validarUsuarioOnLine() {
 
     //let loading = this.loadingCtrl.create({  content: 'Por favor espere...'});
     //loading.present();
 
-    let respuestaWS: any;
+    //console.log("Fecha de sincronizacion : " + fechaSincro);
+
+
+    this.tasksService.obtenerFechaSincroNC(this.data.username)
+      .then(fechasincro => {
+
+        if (fechasincro)
+          if(fechasincro.length>0){
+            this.sincronc = fechasincro[0];
+            let fechaultsincronc = "" + this.sincronc.fechaSincro;
+            console.log("FECHARETORNAloginUser-->" + fechaultsincronc);
+            this.beanSeguridad.FECHASINCRONIZADONC = fechaultsincronc;
+            ///
+            console.log("PARAMETRO DE BUSQEUDA FECHA TABLET " + this.beanSeguridad.FECHASINCRONIZADONC);
+
+            this.tasksService.existenRegistros("FACNOTACREDITOCAB")
+              .then(existe => {
+                this.registronc = existe[0];
+
+                var cadenaJSON = "" + this.registronc.VALOR;
+                console.log("valorFACNOTACREDITOCAB ==> " + cadenaJSON);
+                if (Number(cadenaJSON) > 0) {
+                  this.beanSeguridad.banPrivez = true;
+                }
+
+
+                this.navCtrl.setRoot(HomePage, null);
+
+              });
+
+          }else{
+           // this.beanSeguridad.FECHASINCRONIZADONC = "";
+            console.log("NO EXISTE FECHA " + this.beanSeguridad.FECHASINCRONIZADONC);
+          }
+
+
+
+
+        let respuestaWS: any;
+        //let parametroWS = "&codusuario="+this.data.username+"&codclave="+this.data.password;
+        let parametroWS = {codusuario: this.data.username, codclave: this.data.password};
+        console.log("parametroWS ==> " + parametroWS);
+
+        return new Promise((resolve, reject) => {
+          this.beanSeguridad.obtenerInformacionWS("VERIFICAR_USUARIO_WSJSON", parametroWS)
+            .then(data => {
+              console.log("data validarUsuarioOnLine==> " + JSON.stringify(data));
+              respuestaWS = data;
+
+              if ("true" == respuestaWS.exito) {
+                //loading.dismiss();
+                //Asignacion Clase General Sesion
+
+                this.beanSeguridad.NOMBRE_USUARIO = respuestaWS.nombres;
+                this.beanSeguridad.USUARIO_LOGONEADO = respuestaWS.codusuario;
+                this.beanSeguridad.EN_LINEA = true;
+                this.beanSeguridad.SINCRONIZADO = false;
+                this.beanSeguridad.FECHASINCRONIZADO = ""; //respuestaWS.fechasincronizado;
+                this.beanSeguridad.EMPRESAS = respuestaWS.empresas;
+                //this.beanSeguridad.FECHASINCRONIZADONC = this.beanSeguridad.FECHASINCRONIZADONC;
+
+                console.log("ANTESENVIOINSERT-->" + this.beanSeguridad.FECHASINCRONIZADONC);
+
+                //Actualizar la Base informacion del Vendedor
+                this.registro = {};
+                this.registro.CODUSUARIO = respuestaWS.codusuario;
+                this.registro.NOMBRE = respuestaWS.nombres;
+                this.registro.CLAVE = this.data.password;
+                this.registro.CLIENTESTODOS = "";
+                this.registro.ULTIMAACTUALIZACION = "-------";
+                this.registro.CLIENTESTODOS = respuestaWS.empresas;
+                //this.registro.FECHAACTNC = moment().format('YYYY-MM-DD h:mm:ss');
+                //this.registro.FECHAACTNC = this.beanSeguridad.FECHASINCRONIZADONC;//"------";
+                this.tasksService.insertarRegistros(this.tasksService.TABLA_COBUSUARIOS, this.registro)
+                  .then(response => {
+                    //this.tasks.unshift( data );
+                    console.log("guardado Exitoso");
+
+
+
+                    //Envio a la nueva pantalla
+                    let parametros = {usuario: this.data.username};
+                    this.navCtrl.setRoot(HomePage, parametros);
+
+
+                  })
+                  .catch(error => {
+                    console.error(error);
+                  })
+
+              } else {
+
+                //loading.dismiss();
+
+                let alert = this.alertCtrl.create({
+                  title: 'Atención',
+                  subTitle: ' Error ==> ' + respuestaWS.mensaje,
+                  buttons: ["Aceptar"]
+                });
+                alert.present();
+              }
+
+              //termina proceso
+              resolve();
+
+            })
+            .catch(error => {
+
+              //loading.dismiss();
+              console.log(JSON.stringify(error.json()));
+
+              //Error Comunicacion
+              let alert = this.alertCtrl.create({
+                title: 'Atención',
+                subTitle: ' Error - No existe comunicación con el Servidor ',
+                buttons: ["Aceptar"]
+              });
+              alert.present();
+
+              //termina proceso
+              reject(error.json());
+
+            });
+        });
+
+      });
+
+  }*/
+
+
+  validarUsuarioOnLine(){
+
+    //let loading = this.loadingCtrl.create({  content: 'Por favor espere...'});
+    //loading.present();
+
+    let respuestaWS:any;
     //let parametroWS = "&codusuario="+this.data.username+"&codclave="+this.data.password;
-    let parametroWS = {codusuario: this.data.username, codclave: this.data.password};
+    let parametroWS = {codusuario:this.data.username, codclave:this.data.password};
     console.log("parametroWS ==> " + parametroWS);
 
     return new Promise((resolve, reject) => {
       this.beanSeguridad.obtenerInformacionWS("VERIFICAR_USUARIO_WSJSON", parametroWS)
         .then(data => {
-          console.log("data ==> " + JSON.stringify(data));
+          console.log("data ==> "+JSON.stringify(data));
           respuestaWS = data;
 
-          if ("true" == respuestaWS.exito) {
+          if("true" == respuestaWS.exito){
 
             //loading.dismiss();
 
@@ -189,65 +331,96 @@ export class LoginPage {
             this.beanSeguridad.EN_LINEA = true;
             this.beanSeguridad.SINCRONIZADO = false;
             this.beanSeguridad.FECHASINCRONIZADO = ""; //respuestaWS.fechasincronizado;
-            this.beanSeguridad.EMPRESAS = respuestaWS.empresas;
+            this.beanSeguridad.EMPRESAS =  respuestaWS.empresas;
 
             //Actualizar la Base informacion del Vendedor
             this.registro = {};
             this.registro.CODUSUARIO = respuestaWS.codusuario;
-            this.registro.NOMBRE = respuestaWS.nombres;
+            this.registro.NOMBRE =  respuestaWS.nombres;
             this.registro.CLAVE = this.data.password;
             this.registro.CLIENTESTODOS = "";
             this.registro.ULTIMAACTUALIZACION = "-------";
             this.registro.CLIENTESTODOS = respuestaWS.empresas;
-            this.registro.FECHAACTNC = moment().format('YYYY-MM-DD h:mm:ss');
+
+            this.registrodos.CODUSUARIO =respuestaWS.codusuario;
 
             this.tasksService.insertarRegistros(this.tasksService.TABLA_COBUSUARIOS, this.registro)
               .then(response => {
                 //this.tasks.unshift( data );
                 console.log("guardado Exitoso");
+                //Envio a la nueva pantalla
+
+                this.tasksService.verificaParamnc()
+                  .then(response =>{
+                    console.log("VERFPARAM1->"+JSON.stringify(response));
+                    console.log("VERFPARAM2->"+response[0].VALOR);
+                    //this.tasksdos = response[0].VALOR;
+
+                    //let paramnc = "" + this.tasksdos;
+                    let paramnc = response[0].VALOR;
+                    console.log("EXISTEPARAMNC--->"+paramnc);
+                    if (Number(paramnc) == 0) {
+                      this.tasksService.insertarRegistros(this.tasksService.TABLA_NCPARAMETROS,this.registrodos)
+                        .then(response =>{
+                          console.log("guardado p Exitoso");
+                        })
+                    }else{
+                      console.log("BLOQUEELSE");
+
+                      this.tasksService.obtenerFechaSincroNC(this.beanSeguridad.USUARIO_LOGONEADO)
+                        .then(fechasincro => {
+                          this.sincronc = fechasincro[0];
+                          var fechaultsincronc = "" + this.sincronc.fechaSincro;
+                          console.log("validarUsuarioOnLine-->" + fechaultsincronc);
+                          this.beanSeguridad.FECHASINCRONIZADONC = fechaultsincronc;
+                          ///
+                          console.log("FECHAENVIAR-->" + this.beanSeguridad.FECHASINCRONIZADONC);
+
+                          this.tasksService.existenRegistros("FACNOTACREDITOCAB")
+                            .then(existe => {
+                              this.registronc = existe[0];
+
+                              var cadenaJSON = "" + this.registronc.VALOR;
+                              console.log("CANTIDADREGCABNC ==> " + cadenaJSON);
+                              if (cadenaJSON.length > 0) {
+
+                                this.beanSeguridad.banPrivez = true;
+                                console.log("ASIGNAbanPrivez ==>" + this.beanSeguridad.banPrivez);
+                              }
+
+                            })
+                        })
+                    }
 
 
-                this.tasksService.obtenerFechaSincroNC(this.beanSeguridad.USUARIO_LOGONEADO)
-                  .then(fechasincro => {
-                    this.sincronc = fechasincro[0];
-                    var fechaultsincronc = "" + this.sincronc.fechaSincro;
-                    console.log("FECHARETORNA2-->" + fechaultsincronc);
-                    this.beanSeguridad.FECHASINCRONIZADONC = fechaultsincronc;
-                    ///
-
-
-                    console.log("PARAMETRO DE BUSQEUDA FECHA TABLET " + this.beanSeguridad.FECHASINCRONIZADONC);
-
-                    this.tasksService.existenRegistros("FACNOTACREDITOCAB")
-                      .then(existe => {
-                        this.registronc = existe[0];
-
-                        var cadenaJSON = "" + this.registronc.VALOR;
-                        console.log("valorFACNOTACREDITOCAB ==> " + cadenaJSON);
-                        if (Number(cadenaJSON) > 0) {
-                          this.beanSeguridad.banPrivez = true;
-                        }
-
-
-                        //Envio a la nueva pantalla
-                        let parametros = {usuario: this.data.username};
-                        this.navCtrl.setRoot(HomePage, parametros);
-                      });
                   });
+                let parametros = {usuario:this.data.username};
+                this.navCtrl.setRoot(HomePage, parametros);
+
+                /*this.tasksService.insertarRegistros(this.tasksService.TABLA_NCPARAMETROS,this.registrodos)
+                  .then(response =>{
+                  console.log("guardado p Exitoso");
+                  let parametros = {usuario:this.data.username};
+                  this.navCtrl.setRoot(HomePage, parametros);
+                });*/
+
+
+
 
 
               })
-              .catch(error => {
-                console.error(error);
+
+              .catch( error => {
+                console.error( error );
               })
 
-          } else {
+          }else{
 
             //loading.dismiss();
 
             let alert = this.alertCtrl.create({
               title: 'Atención',
-              subTitle: ' Error ==> ' + respuestaWS.mensaje,
+              subTitle: ' Error ==> '+respuestaWS.mensaje,
               buttons: ["Aceptar"]
             });
             alert.present();
@@ -257,7 +430,7 @@ export class LoginPage {
           resolve();
 
         })
-        .catch(error => {
+        .catch( error => {
 
           //loading.dismiss();
           console.log(JSON.stringify(error.json()));

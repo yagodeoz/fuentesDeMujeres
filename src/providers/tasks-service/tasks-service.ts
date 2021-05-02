@@ -29,6 +29,7 @@ export class TasksServiceProvider {
   public TABLA_FACNOTACREDITODET = "FACNOTACREDITODET";
   //VTAMA
   public TABLA_SOLICITUDESNC = "SOLICITUDESNC";
+  public TABLA_NCPARAMETROS = "NCPARAMETROS";
 
 
   //Creacion Tablas
@@ -155,6 +156,10 @@ export class TasksServiceProvider {
                               +'CODESTADO TEXT,'
                               +'OBSERVACIONES TEXT,'
                               +'FECRESP_MWB TEXT )';
+
+  public SQL_NCPARAMETROS  = 'CREATE TABLE IF NOT EXISTS '+this.TABLA_NCPARAMETROS+'('
+    +'CODUSUARIO TEXT , '
+    +'FECHAACTUALIZANC TEXT )';
   //public esPrivez: boolean =false;//15032021
 
 
@@ -182,6 +187,7 @@ export class TasksServiceProvider {
     this.crearTabla(this.TABLA_FACNOTACREDITOCAB);
     this.crearTabla(this.TABLA_FACNOTACREDITODET);
     this.crearTabla(this.TABLA_SOLICITUDESNC);
+    this.crearTabla(this.TABLA_NCPARAMETROS);
     //this.esPrivez = true;//15032021
     //Retorno al final de las ejecuciones
     return true;
@@ -238,12 +244,15 @@ export class TasksServiceProvider {
       sql = sql.replace('[VALORES]',"?,?,?,?,?,?");
 
       console.log("sql ==> "+sql);
+      console.log("FECHAENVIADAINSERTAR--> "+registro.FECHAACTNC);
+      console.log("CADENAVALORES--> "+JSON.stringify(registro) );
       valores = [registro.CODUSUARIO,
                  registro.NOMBRE,
                  registro.CLAVE,
                  registro.CLIENTESTODOS,
                  registro.ULTIMAACTUALIZACION,
                  registro.FECHAACTNC];
+
     }
 
     //Tabla COBCARTERA CABECERA
@@ -406,6 +415,16 @@ export class TasksServiceProvider {
         registro.FECRESP_MWB];
     }
 
+    if(this.TABLA_NCPARAMETROS == tabla){
+      sql = sql.replace('[TABLA]',this.TABLA_NCPARAMETROS);
+      sql = sql.replace('[CAMPOS]',"CODUSUARIO, FECHAACTUALIZANC");
+      sql = sql.replace('[VALORES]',"?,?");
+
+      console.log("sql ==> "+sql);
+      valores = [registro.CODUSUARIO, registro.FECHAACTUALIZANC];
+    }
+
+
     console.log("sql ==> "+sql);
     return this.db.executeSql(sql, valores);
   }
@@ -479,6 +498,9 @@ export class TasksServiceProvider {
     }
     if (this.TABLA_SOLICITUDESNC == tabla){
       sql = this.SQL_SOLICITUDESNC;
+    }
+    if (this.TABLA_NCPARAMETROS == tabla){
+      sql = this.SQL_NCPARAMETROS;
     }
 
     console.log("sql ==> "+sql);
@@ -962,14 +984,15 @@ export class TasksServiceProvider {
       .catch(error => Promise.reject(error));
   }
   //actualiza fecha 160302021
+
   updateFechaNC(registro: any){
-    let sql = "UPDATE "+this.TABLA_COBUSUARIOS+" SET FECHAACTNC = ? WHERE CODUSUARIO = '"+registro.CODUSUARIO+"'";
-    console.log("sql ==> "+sql);
+    let sql = "UPDATE "+this.TABLA_NCPARAMETROS+" SET FECHAACTUALIZANC = ? WHERE CODUSUARIO = '"+registro.CODUSUARIO+"'";
+    console.log("sql ==> "+sql + " fecha--> "+registro.ULTIMAACTUALIZACION);
     return this.db.executeSql(sql, [registro.ULTIMAACTUALIZACION]);
   }
 
   obtenerFechaSincroNC(usuario:string){
-    let sql = "SELECT FECHAACTNC as fechaSincro from COBUSUARIOS WHERE CODUSUARIO = '"+ usuario+"'" ;
+    let sql = "SELECT FECHAACTUALIZANC as fechaSincro from NCPARAMETROS WHERE CODUSUARIO = '"+ usuario+"'" ;
     console.log("FECHASINCRO_NC ==> "+sql);
     return this.db.executeSql(sql, [])
       .then(response => {
@@ -981,5 +1004,23 @@ export class TasksServiceProvider {
       })
       .catch(error => Promise.reject(error));
   }
+
+
+  //verifica que existan datos en tablas de nota de credito
+  verificaParamnc(){
+    let sql = "SELECT COUNT(*) as VALOR FROM NCPARAMETROS ";
+    console.log("verificaParamnc ==> "+sql);
+    return this.db.executeSql(sql, [])
+      .then(response => {
+        let registros = [];
+        for (let index = 0; index < response.rows.length; index++) {
+          registros.push( response.rows.item(index) );
+        }
+        return Promise.resolve( registros );
+      })
+      .catch(error => Promise.reject(error));
+  }
+
+
 
 }

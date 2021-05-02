@@ -27,7 +27,7 @@ export class BeanSeguridad {
 
   //
   public banPrivez: boolean = false;//16032021
-  public FECHASINCRONIZADONC = "";
+  public FECHASINCRONIZADONC = "2021-03-01 00:00:01";
 
 
   //public controlParametros: boolean = true;
@@ -727,6 +727,10 @@ export class BeanSeguridad {
                 CODPARAMETRO: "TIPOSNC",
                 VALOR: JSON.stringify(respuestaWS.tiposnc)
               }))//VTAMA
+              /*.then(() => this.tasksService.insertarRegistros(this.tasksService.TABLA_NCPARAMETROS, {
+                CODUSUARIO: "TIPOSNC",
+                VALOR: JSON.stringify(respuestaWS.tiposnc)
+              }))//VTAMA*/
               .then(() => resolve(respuestaWS));
           } else {
             let alert = this.alertCtrl.create({
@@ -809,6 +813,7 @@ export class BeanSeguridad {
 
       console.log("ACTUALIZAFECHASINCRO_NC ==> ");
       parametroWS = {};
+      parametroWS = {fechaActualizaTablet: this.FECHASINCRONIZADONC};
       this.obtenerInformacionWS("ACTUALIZAFECHASINCRO_NC", parametroWS)
         .then(data => {
           respuestaWS = data;
@@ -821,7 +826,7 @@ export class BeanSeguridad {
             })
               .then(data => {
                 console.log("Registros NC a la fecha-->" + respuestaWS.fecha);
-                this.FECHASINCRONIZADO = respuestaWS.fecha;
+                this.FECHASINCRONIZADONC = respuestaWS.fecha;
 
               }).catch(error => {
               console.log("ERROR ==> " + JSON.stringify(error.json()));
